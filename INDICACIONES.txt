@@ -1,0 +1,11 @@
+------------INDICACIONES--------------------
+
+PASO 1:Iniciar Apache y MySQL en XAMPP
+
+PASO 2: Descomprimir las carpetas duts_api y duts_frontend
+en la carpeta htdocs de XAMPP
+
+PASO 3: En tu navegador de preferencia buscar la 
+url de acceso http://localhost/duts_frontend/
+
+¡Y LISTO!,Ya puedes disfrutar de la mejor plataforma financiera. ;)

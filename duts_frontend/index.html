@@ -1,0 +1,2365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DUTS Platform - Frontend</title>
+    <!-- CDN de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fuente Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background-color: #f3f4f6; /* Fondo gris claro de Tailwind */
+        }
+        /* Estilos básicos para mensajes */
+        .message {
+            display: none;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: 500;
+        }
+        .message.success {
+            background-color: #d1fae5; /* green-100 */
+            color: #065f46; /* green-800 */
+        }
+        .message.error {
+            background-color: #fee2e2; /* red-100 */
+            color: #991b1b; /* red-800 */
+        }
+        .message.info { /* Nuevo estilo para mensajes de información/cancelación */
+            background-color: #bfdbfe; /* blue-100 */
+            color: #1e40af; /* blue-800 */
+        }
+        /* Ocultar secciones por defecto */
+        .tab-content-section {
+            display: none;
+        }
+        /* Estilo para tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            border-radius: 0.5rem;
+            overflow: hidden; /* Para que los bordes redondeados se vean bien */
+        }
+        th, td {
+            padding: 0.75rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb; /* gray-200 */
+        }
+        th {
+            background-color: #f9fafb; /* gray-50 */
+            font-weight: 600;
+            color: #4b5563; /* gray-600 */
+            text-transform: uppercase;
+            font-size: 0.875rem; /* text-sm */
+            line-height: 1.25rem; /* leading-normal */
+        }
+        tr:hover {
+            background-color: #f3f4f6; /* gray-100 */
+        }
+        /* Estilos para formularios y botones */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.25rem;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="number"],
+        .form-group input[type="password"],
+        .form-group input[type="date"],
+        .form-group textarea,
+        .form-group select {
+            display: block;
+            width: 100%;
+            padding: 0.625rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            font-size: 0.875rem;
+            color: #1f2937;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3b82f6; /* blue-500 */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); /* ring-blue-500 */
+        }
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.625rem 1.25rem;
+            border-radius: 0.375rem;
+            font-weight: 700;
+            color: white;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+        }
+        .button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .button.primary {
+            background-color: #3b82f6; /* blue-500 */
+        }
+        .button.primary:hover {
+            background-color: #2563eb; /* blue-600 */
+        }
+        .button.success {
+            background-color: #10b981; /* green-500 */
+        }
+        .button.success:hover {
+            background-color: #059669; /* green-600 */
+        }
+        .button.danger {
+            background-color: #ef4444; /* red-500 */
+        }
+        .button.danger:hover {
+            background-color: #dc2626; /* red-600 */
+        }
+        .button.purple {
+            background-color: #8b5cf6; /* purple-500 */
+        }
+        .button.purple:hover {
+            background-color: #7c3aed; /* purple-600 */
+        }
+        .button.indigo {
+            background-color: #6366f1; /* indigo-500 */
+        }
+        .button.indigo:hover {
+            background-color: #4f46e5; /* indigo-600 */
+        }
+        .button.teal {
+            background-color: #2dd4bf; /* teal-500 */
+        }
+        .button.teal:hover {
+            background-color: #14b8a6; /* teal-600 */
+        }
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .section-card {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            margin-bottom: 1.5rem;
+        }
+        .subsection-card {
+            background-color: #f9fafb; /* gray-50 */
+            padding: 1rem;
+            border-radius: 0.375rem;
+            border: 1px solid #e5e7eb; /* gray-200 */
+            margin-bottom: 1rem;
+        }
+        .tab-button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: #bfdbfe; /* blue-200 */
+        }
+        .tab-button.active {
+            background-color: #1d4ed8; /* blue-700 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .tab-button:not(.active):hover {
+            background-color: #1e40af; /* blue-800 */
+            color: white;
+        }
+    </style>
+    <!-- Iconos de Lucide (usando CDN para HTML puro) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        // Función para renderizar iconos de Lucide
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+        });
+    </script>
+</head>
+<body>
+    <div class="min-h-screen bg-gray-100 flex flex-col">
+        <!-- Header / Top Navbar -->
+        <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 shadow-md rounded-b-lg">
+            <div class="container mx-auto flex flex-col sm:flex-row justify-between items-center">
+                <h1 class="text-3xl font-bold mb-2 sm:mb-0">DUTS App</h1>
+                <nav class="flex flex-wrap justify-center sm:justify-end gap-2">
+                    <button class="tab-button active" data-tab="dashboard">
+                        <i data-lucide="home" class="w-4 h-4"></i> Inicio
+                    </button>
+                    <button class="tab-button" data-tab="users">
+                        <i data-lucide="users" class="w-4 h-4"></i> Usuarios
+                    </button>
+                    <button class="tab-button" data-tab="duts">
+                        <i data-lucide="dollar-sign" class="w-4 h-4"></i> DUTS
+                    </button>
+                    <button class="tab-button" data-tab="events">
+                        <i data-lucide="calendar" class="w-4 h-4"></i> Eventos
+                    </button>
+                    <button class="tab-button" data-tab="stats">
+                        <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Estadísticas
+                    </button>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="container mx-auto p-4 flex-grow">
+            <!-- User Info / Login Section (Siempre visible en la parte superior del contenido principal) -->
+            <div class="section-card">
+                <div id="userInfo" class="hidden flex items-center justify-between">
+                    <div>
+                        <p class="text-lg font-semibold">Bienvenido, <span id="loggedInUsername" class="text-blue-600"></span>!</p>
+                        <p class="text-sm text-gray-600">ID: <span id="loggedInUserId" class="font-mono"></span></p>
+                        <p class="text-sm text-gray-600">Saldo DUTS: <span id="dutsProgress" class="font-bold text-blue-700">0</span></p>
+                    </div>
+                    <button id="logoutButton" class="button danger">
+                        <i data-lucide="log-out" class="w-4 h-4 mr-2"></i> Cerrar Sesión
+                    </button>
+                </div>
+
+                <form id="loginForm" class="space-y-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Iniciar Sesión</h2>
+                    <div id="loginMessage" class="message"></div>
+                    <div class="form-group">
+                        <label for="login_username">Usuario:</label>
+                        <input type="text" id="login_username" name="login_username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login_password">Contraseña:</label>
+                        <input type="password" id="login_password" name="login_password" required>
+                    </div>
+                    <button type="submit" class="button primary">
+                        <i data-lucide="log-in" class="w-4 h-4 mr-2"></i> Iniciar Sesión
+                    </button>
+                </form>
+            </div>
+
+            <!-- Dashboard Tab Content -->
+            <div id="dashboard-tab" class="tab-content-section" style="display: block;">
+                <div class="section-card">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Bienvenido a DUTS App</h2>
+                    <p class="text-gray-700">
+                        Esta aplicación te permite gestionar usuarios, realizar transacciones DUTS,
+                        administrar eventos y ver estadísticas importantes.
+                    </p>
+                    <p class="mt-4 text-gray-600">
+                        Usa la barra de navegación superior para explorar las diferentes secciones.
+                    </p>
+                    <div id="dashboard-summary" class="mt-6 p-4 bg-blue-50 rounded-md hidden">
+                        <h3 class="text-xl font-semibold text-blue-800 mb-2">Tu Resumen Rápido:</h3>
+                        <p class="text-blue-700">ID de Usuario: <span id="dashboardUserId" class="font-mono"></span></p>
+                        <p class="text-blue-700">Nombre de Usuario: <span id="dashboardUsername" class="font-semibold"></span></p>
+                        <p class="text-blue-700">Saldo DUTS Actual: <span id="dashboardDutsBalance" class="font-bold text-2xl"></span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Tab Content -->
+            <div id="users-tab" class="tab-content-section">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Gestión de Usuarios</h2>
+
+                <!-- Botones para mostrar formularios de usuario (Visibles solo para Administradores) -->
+                <div class="flex space-x-4 mb-6" id="userManagementButtons" style="display: none;">
+                    <button id="showRegisterFormButton" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 transition duration-300">
+                        Registrar Nuevo Usuario
+                    </button>
+                    <button id="showUpdateFormButton" class="px-6 py-3 bg-green-600 text-white font-semibold rounded-md shadow-md hover:bg-green-700 transition duration-300">
+                        Actualizar Usuario Existente
+                    </button>
+                    <button id="showDeleteUserFormButton" class="px-6 py-3 bg-red-600 text-white font-semibold rounded-md shadow-md hover:bg-red-700 transition duration-300">
+                        Eliminar Usuario
+                    </button>
+                </div>
+
+                <!-- Contenedor del Formulario de Registro (oculto por defecto, visible para Admin) -->
+                <div id="registerFormContainer" class="section-card bg-white p-6 rounded-lg shadow-sm mb-6" style="display: none;">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Registrar Nuevo Usuario</h3>
+                    <span id="registerMessage" class="message" style="display: none;"></span>
+                    <form id="registerFormNew" class="space-y-4">
+                        <!-- Campos del formulario de registro -->
+                        <input type="text" id="reg_nombres" placeholder="Nombres" required class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <input type="text" id="reg_apellidos" placeholder="Apellidos" required class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <input type="email" id="reg_email" placeholder="Email" required class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <input type="text" id="reg_ciudad" placeholder="Ciudad" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <input type="text" id="reg_pais" placeholder="País" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <textarea id="reg_descripcion" placeholder="Descripción (opcional)" rows="3" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        <input type="text" id="reg_intereses" placeholder="Intereses (separados por coma)" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <input type="text" id="reg_programa" placeholder="Programa de Estudio" required class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <input type="number" id="reg_semestre" placeholder="Semestre" required class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <input type="text" id="reg_username" placeholder="Nombre de Usuario" required class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <input type="password" id="reg_password" placeholder="Contraseña" required class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <select id="reg_rol" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            <option value="estudiante">Estudiante</option>
+                            <option value="profesor">Profesor</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                        <div class="flex space-x-4">
+                            <button type="submit" class="w-full px-4 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition duration-300">Registrar</button>
+                            <button type="button" id="hideRegisterFormButton" class="w-full px-4 py-2 bg-gray-300 text-gray-800 font-semibold rounded-md hover:bg-gray-400 transition duration-300">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Contenedor del Formulario de Actualización (oculto por defecto, visible para Admin) -->
+                <div id="updateUserFormContainer" class="section-card bg-white p-6 rounded-lg shadow-sm mb-6" style="display: none;">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Actualizar Usuario Existente</h3>
+                    <span id="updateUserMessage" class="message" style="display: none;"></span>
+                    <form id="updateUserForm" class="space-y-4">
+                        <div class="flex items-center space-x-2">
+                            <input type="text" id="update_userId" placeholder="ID de Usuario a Actualizar" required class="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                            <button type="button" id="loadUserDataForUpdate" class="px-4 py-2 bg-indigo-500 text-white font-semibold rounded-md hover:bg-indigo-600 transition duration-300">Cargar Datos</button>
+                        </div>
+                        <!-- Campos del formulario de actualización (se llenarán con los datos cargados) -->
+                        <input type="text" id="update_nombres" placeholder="Nombres" class="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                        <input type="text" id="update_apellidos" placeholder="Apellidos" class="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                        <input type="email" id="update_email" placeholder="Email" class="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                        <input type="text" id="update_ciudad" placeholder="Ciudad" class="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                        <input type="text" id="update_pais" placeholder="País" class="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                        <textarea id="update_descripcion" placeholder="Descripción (opcional)" rows="3" class="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"></textarea>
+                        <input type="text" id="update_intereses" placeholder="Intereses (separados por coma)" class="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                        <input type="text" id="update_programa" placeholder="Programa de Estudio" class="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                        <input type="number" id="update_semestre" placeholder="Semestre" class="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                        <input type="text" id="update_username" placeholder="Nombre de Usuario" class="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                        <input type="password" id="update_password" placeholder="Nueva Contraseña (dejar vacío para no cambiar)" class="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                        <select id="update_rol" class="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                            <option value="">Seleccionar Rol (dejar vacío para no cambiar)</option>
+                            <option value="estudiante">Estudiante</option>
+                            <option value="profesor">Profesor</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                        <div class="flex space-x-4">
+                            <button type="submit" class="w-full px-4 py-2 bg-green-500 text-white font-semibold rounded-md hover:bg-green-600 transition duration-300">Actualizar</button>
+                            <button type="button" id="hideUpdateFormButton" class="w-full px-4 py-2 bg-gray-300 text-gray-800 font-semibold rounded-md hover:bg-gray-400 transition duration-300">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Contenedor del Formulario de Eliminación de Usuario (oculto por defecto, visible para Admin) -->
+                <div id="deleteUserFormContainer" class="section-card bg-white p-6 rounded-lg shadow-sm mb-6" style="display: none;">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Eliminar Usuario</h3>
+                    <span id="deleteUserMessage" class="message" style="display: none;"></span>
+                    <form id="deleteUserForm" class="space-y-4">
+                        <div class="form-group">
+                            <label for="delete_userId">ID de Usuario a Eliminar:</label>
+                            <input type="text" id="delete_userId" name="delete_userId" required class="w-full p-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500">
+                        </div>
+                        <div class="flex space-x-4">
+                            <button type="submit" class="w-full px-4 py-2 bg-red-500 text-white font-semibold rounded-md hover:bg-red-600 transition duration-300">Eliminar Usuario</button>
+                            <button type="button" id="hideDeleteUserFormButton" class="w-full px-4 py-2 bg-gray-300 text-gray-800 font-semibold rounded-md hover:bg-gray-400 transition duration-300">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+
+
+                <div class="section-card bg-white p-6 rounded-lg shadow-sm mb-6">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Ver Perfil de Usuario</h3>
+                    <form id="viewUserForm" class="flex items-center space-x-2 mb-4">
+                        <input type="text" id="view_userId" placeholder="ID de Usuario" required class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <button type="submit" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition duration-300">Ver Perfil</button>
+                    </form>
+                    <div id="viewUserResultMessage" class="message" style="display: none;"></div>
+                    <div id="viewUserResultContentDiv" class="mt-4 p-4 bg-gray-100 rounded-md" style="display: none;"></div>
+                </div>
+
+                <div class="section-card bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Listar Todos los Usuarios</h3>
+                    <button id="loadUsersButton" class="px-6 py-3 bg-purple-600 text-white font-semibold rounded-md shadow-md hover:bg-purple-700 transition duration-300 mb-4">
+                        Cargar Usuarios
+                    </button>
+                    <span id="usersMessage" class="message" style="display: none;"></span>
+                    <div id="usersList" class="mt-4 overflow-x-auto">
+                        <!-- La lista de usuarios se cargará aquí -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- DUTS Tab Content -->
+            <div id="duts-tab" class="tab-content-section">
+                <!-- Transferir DUTS -->
+                <div class="section-card">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Transferir DUTS</h2>
+                    <form id="transferDutsForm" class="space-y-4">
+                        <div id="transferMessage" class="message"></div>
+                        <div class="form-group">
+                            <label for="transfer_dest_id">ID de Destino:</label>
+                            <input type="text" id="transfer_dest_id" name="transfer_dest_id" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="transfer_amount">Cantidad:</label>
+                            <input type="number" id="transfer_amount" name="transfer_amount" step="0.01" required>
+                        </div>
+                        <button type="submit" class="button purple">
+                            <i data-lucide="arrow-right-left" class="w-4 h-4 mr-2"></i> Transferir DUTS
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Mi Saldo DUTS -->
+                <div class="section-card">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Mi Saldo DUTS</h2>
+                    <button id="loadMyBalanceButton" class="button primary">
+                        <i data-lucide="wallet" class="w-4 h-4 mr-2"></i> Ver mi Saldo
+                    </button>
+                    <div id="myBalanceResult" class="message mt-4"></div>
+                </div>
+
+                <!-- Total DUTS Enviados/Recibidos -->
+                <div class="section-card">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Estadísticas de DUTS</h2>
+                    <div class="button-group">
+                        <button id="loadTotalSentButton" class="button indigo">
+                            <i data-lucide="arrow-up" class="w-4 h-4 mr-2"></i> Total Enviados
+                        </button>
+                        <button id="loadTotalReceivedButton" class="button teal">
+                            <i data-lucide="arrow-down" class="w-4 h-4 mr-2"></i> Total Recibidos
+                        </button>
+                    </div>
+                    <div id="totalDutsResult" class="message mt-4"></div>
+                </div>
+            </div>
+
+            <!-- Events Tab Content -->
+            <div id="events-tab" class="tab-content-section">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Gestión de Eventos</h2>
+
+                <!-- Botones para mostrar formularios de evento (Visibles solo para Administradores) -->
+                <div class="flex space-x-4 mb-6" id="eventManagementButtons" style="display: none;">
+                    <button id="showCreateEventFormButton" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 transition duration-300">
+                        Crear Nuevo Evento
+                    </button>
+                    <button id="showUpdateEventFormButton" class="px-6 py-3 bg-green-600 text-white font-semibold rounded-md shadow-md hover:bg-green-700 transition duration-300">
+                        Actualizar Evento
+                    </button>
+                    <button id="showDeleteEventFormButton" class="px-6 py-3 bg-red-600 text-white font-semibold rounded-md shadow-md hover:bg-red-700 transition duration-300">
+                        Eliminar Evento
+                    </button>
+                </div>
+
+                <!-- Contenedor Crear Evento - Solo visible para admins -->
+                <div id="createEventFormContainer" class="section-card" style="display: none;">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Crear Evento</h3>
+                    <span id="createEventMessage" class="message" style="display: none;"></span>
+                    <form id="createEventForm" class="space-y-4">
+                        <div class="form-group"><label for="event_nombre">Nombre del Evento:</label><input type="text" id="event_nombre" name="nombre" required></div>
+                        <div class="form-group"><label for="event_descripcion">Descripción:</label><textarea id="event_descripcion" name="descripcion" rows="3"></textarea></div>
+                        <div class="form-group"><label for="event_fecha">Fecha:</label><input type="date" id="event_fecha" name="fecha" required></div>
+                        <div class="form-group"><label for="event_tipo">Tipo de Evento:</label><input type="text" id="event_tipo" name="tipo_evento" required></div>
+                        <div class="flex space-x-4">
+                            <button type="submit" class="w-full px-4 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition duration-300">Crear Evento</button>
+                            <button type="button" id="hideCreateEventFormButton" class="w-full px-4 py-2 bg-gray-300 text-gray-800 font-semibold rounded-md hover:bg-gray-400 transition duration-300">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Contenedor Actualizar Evento - Solo visible para admins -->
+                <div id="updateEventFormContainer" class="section-card" style="display: none;">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Actualizar Evento</h3>
+                    <span id="updateEventMessage" class="message" style="display: none;"></span>
+                    <form id="updateEventForm" class="space-y-4">
+                        <div class="flex items-center space-x-2 mb-4">
+                            <input type="text" id="update_eventId" placeholder="ID de Evento a Actualizar" required class="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                            <button type="button" id="loadEventDataForUpdate" class="px-4 py-2 bg-indigo-500 text-white font-semibold rounded-md hover:bg-indigo-600 transition duration-300">Cargar Datos</button>
+                        </div>
+                        <input type="text" id="update_event_nombre" placeholder="Nombre del Evento" class="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                        <textarea id="update_event_descripcion" placeholder="Descripción" rows="3" class="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"></textarea>
+                        <input type="date" id="update_event_fecha" placeholder="Fecha" class="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                        <input type="text" id="update_event_tipo" placeholder="Tipo de Evento" class="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                        <div class="flex space-x-4">
+                            <button type="submit" class="w-full px-4 py-2 bg-green-500 text-white font-semibold rounded-md hover:bg-green-600 transition duration-300">Actualizar Evento</button>
+                            <button type="button" id="hideUpdateEventFormButton" class="w-full px-4 py-2 bg-gray-300 text-gray-800 font-semibold rounded-md hover:bg-gray-400 transition duration-300">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Contenedor Eliminar Evento - Solo visible para admins -->
+                <div id="deleteEventFormContainer" class="section-card" style="display: none;">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Eliminar Evento</h3>
+                    <span id="deleteEventMessage" class="message" style="display: none;"></span>
+                    <form id="deleteEventForm" class="space-y-4">
+                        <div class="form-group">
+                            <label for="delete_eventId">ID de Evento a Eliminar:</label>
+                            <input type="text" id="delete_eventId" name="delete_eventId" required class="w-full p-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500">
+                        </div>
+                        <div class="flex space-x-4">
+                            <button type="submit" class="w-full px-4 py-2 bg-red-500 text-white font-semibold rounded-md hover:bg-red-600 transition duration-300">Eliminar Evento</button>
+                            <button type="button" id="hideDeleteEventFormButton" class="w-full px-4 py-2 bg-gray-300 text-gray-800 font-semibold rounded-md hover:bg-gray-400 transition duration-300">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Registrarse/Darse de Baja en Evento -->
+                <div class="section-card">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Registro/Baja en Eventos</h2>
+                    <form id="registerUnregisterEventForm" class="space-y-4">
+                        <div id="eventRegMessage" class="message"></div>
+                        <div class="form-group">
+                            <label for="event_reg_id">ID de Evento:</label>
+                            <input type="text" id="event_reg_id" name="event_reg_id" required>
+                        </div>
+                        <div class="button-group">
+                            <button type="button" id="registerEventButton" class="button primary">
+                                <i data-lucide="user-check" class="w-4 h-4 mr-2"></i> Registrarse
+                            </button>
+                            <button type="button" id="unregisterEventButton" class="button danger">
+                                <i data-lucide="user-x" class="w-4 h-4 mr-2"></i> Darse de Baja
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Cargar Eventos Futuros -->
+                <div class="section-card">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Eventos Futuros</h2>
+                    <button id="loadFutureEventsButton" class="button primary">
+                        <i data-lucide="calendar" class="w-4 h-4 mr-2"></i> Cargar Eventos Futuros
+                    </button>
+                    <div id="futureEventsMessage" class="message"></div>
+                    <div id="futureEventsList" class="overflow-x-auto"></div>
+                </div>
+
+                <!-- Buscar Eventos por Tipo -->
+                <div class="section-card">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Buscar Eventos por Tipo</h2>
+                    <div class="form-group">
+                        <label for="eventTypeSearch">Tipo de Evento:</label>
+                        <input type="text" id="eventTypeSearch" placeholder="Ej: CIINATIC">
+                    </div>
+                    <button id="searchEventsByTypeButton" class="button primary">
+                        <i data-lucide="search" class="w-4 h-4 mr-2"></i> Buscar Eventos
+                    </button>
+                    <div id="eventsByTypeMessage" class="message mt-4"></div>
+                    <div id="eventsByTypeResult" class="overflow-x-auto mt-4"></div>
+                </div>
+
+                <!-- Eventos Populares -->
+                <div class="section-card">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Eventos Populares (Más de N inscritos)</h2>
+                    <div class="form-group">
+                        <label for="minInscriptions">Mínimo de Inscritos:</label>
+                        <input type="number" id="minInscriptions" value="1">
+                    </div>
+                    <button id="loadPopularEventsButton" class="button primary">
+                        <i data-lucide="award" class="w-4 h-4 mr-2"></i> Cargar Populares
+                    </button>
+                    <div id="popularEventsMessage" class="message mt-4"></div>
+                    <div id="popularEventsList" class="overflow-x-auto mt-4"></div>
+                </div>
+            </div>
+
+            <!-- Stats Tab Content -->
+            <div id="stats-tab" class="tab-content-section">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Estadísticas de DUTS y Eventos</h2>
+
+                <!-- Promedios de DUTS (NUEVO) -->
+                <div class="section-card">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Promedios de DUTS</h2>
+                    <div class="button-group">
+                        <button id="loadDailyAverageDutsButton" class="button primary">
+                            <i data-lucide="calendar-days" class="w-4 h-4 mr-2"></i> Promedio Diario
+                        </button>
+                        <button id="loadWeeklyAverageDutsButton" class="button indigo">
+                            <i data-lucide="calendar-week" class="w-4 h-4 mr-2"></i> Promedio Semanal
+                        </button>
+                        <button id="loadMonthlyAverageDutsButton" class="button teal">
+                            <i data-lucide="calendar-range" class="w-4 h-4 mr-2"></i> Promedio Mensual
+                        </button>
+                        <button id="loadSemesterlyAverageDutsButton" class="button purple">
+                            <i data-lucide="calendar-heart" class="w-4 h-4 mr-2"></i> Promedio Semestral
+                        </button>
+                        <button id="loadYearlyAverageDutsButton" class="button success">
+                            <i data-lucide="calendar" class="w-4 h-4 mr-2"></i> Promedio Anual
+                        </button>
+                    </div>
+                    <div id="dutsAveragesMessage" class="message mt-4"></div>
+                    <div id="dailyDutsAverageList" class="overflow-x-auto mt-4"></div>
+                    <div id="weeklyDutsAverageList" class="overflow-x-auto mt-4"></div>
+                    <div id="monthlyDutsAverageList" class="overflow-x-auto mt-4"></div>
+                    <div id="semesterlyDutsAverageList" class="overflow-x-auto mt-4"></div>
+                    <div id="yearlyDutsAverageList" class="overflow-x-auto mt-4"></div>
+                </div>
+
+                <!-- Top 5 Usuarios con Más DUTS -->
+                <div class="section-card">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Top 5 Usuarios con Más DUTS</h2>
+                    <button id="loadTopUsersButton" class="button primary">
+                        <i data-lucide="award" class="w-4 h-4 mr-2"></i> Cargar Top Usuarios
+                    </button>
+                    <div id="topUsersMessage" class="message"></div>
+                    <div id="topUsersList" class="overflow-x-auto"></div>
+                </div>
+
+                <!-- ¡NUEVO! Top 5 Usuarios con Menos DUTS -->
+                <div class="section-card">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Top 5 Usuarios con Menos DUTS</h2>
+                    <button id="loadLeastUsersButton" class="button primary">
+                        <i data-lucide="trending-down" class="w-4 h-4 mr-2"></i> Cargar Usuarios con Menos DUTS
+                    </button>
+                    <div id="leastUsersMessage" class="message"></div>
+                    <div id="leastUsersList" class="overflow-x-auto"></div>
+                </div>
+
+                <!-- Cantidad de Eventos a los que un Usuario está Inscrito -->
+                <div class="section-card">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Conteo de Eventos de un Usuario</h2>
+                    <form id="userEventCountForm" class="space-y-4">
+                        <div id="userEventCountResult" class="message"></div>
+                        <div class="form-group">
+                            <label for="userEventCountId">ID de Usuario:</label>
+                            <input type="text" id="userEventCountId" name="userEventCountId" required>
+                        </div>
+                        <button type="submit" class="button primary">
+                            <i data-lucide="calendar" class="w-4 h-4 mr-2"></i> Ver Conteo
+                        </button>
+                    </form>
+                    <div id="userEventCountDisplay" class="mt-4 text-gray-700" style="display: none;"></div>
+                </div>
+
+                <!-- Usuarios Inscritos en un Evento Específico -->
+                <div class="section-card">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Usuarios Inscritos en un Evento</h2>
+                    <form id="eventUsersForm" class="space-y-4">
+                        <div id="eventUsersMessage" class="message"></div>
+                        <div class="form-group">
+                            <label for="eventUsersId">ID de Evento:</label>
+                            <input type="text" id="eventUsersId" name="eventUsersId" required>
+                        </div>
+                        <button type="submit" class="button primary">
+                            <i data-lucide="users" class="w-4 h-4 mr-2"></i> Ver Inscritos
+                        </button>
+                    </form>
+                    <div id="eventUsersList" class="overflow-x-auto mt-4"></div>
+                </div>
+
+                <!-- Usuarios Sin Asistencia a Eventos -->
+                <div class="section-card">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Usuarios Sin Asistencia a Eventos</h2>
+                    <button id="loadUsersNoEventsButton" class="button primary">
+                        <i data-lucide="user-x" class="w-4 h-4 mr-2"></i> Cargar Usuarios
+                    </button>
+                    <div id="usersNoEventsMessage" class="message"></div>
+                    <div id="usersNoEventsList" class="overflow-x-auto"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Define la URL base de tu API
+        const API_BASE_URL = 'http://localhost/duts_api/api/';
+
+        // --- Variables para los elementos HTML ---
+        // Elementos de autenticación (siempre visibles)
+        const loginForm = document.getElementById('loginForm');
+        const loginMessage = document.getElementById('loginMessage');
+        const userInfoDiv = document.getElementById('userInfo');
+        const loggedInUsernameSpan = document.getElementById('loggedInUsername');
+        const loggedInUserIdSpan = document.getElementById('loggedInUserId');
+        const logoutButton = document.getElementById('logoutButton');
+        const dutsProgressSpan = document.getElementById('dutsProgress');
+
+        // Elementos del Dashboard
+        const dashboardUserIdSpan = document.getElementById('dashboardUserId');
+        const dashboardUsernameSpan = document.getElementById('dashboardUsername');
+        const dashboardDutsBalanceSpan = document.getElementById('dashboardDutsBalance');
+        const dashboardSummaryDiv = document.getElementById('dashboard-summary');
+
+
+        // Elementos de la pestaña USUARIOS
+        const userManagementButtons = document.getElementById('userManagementButtons'); // Nuevo contenedor para botones de gestión de usuarios
+        const showRegisterFormButton = document.getElementById('showRegisterFormButton');
+        const showUpdateFormButton = document.getElementById('showUpdateFormButton');
+        const showDeleteUserFormButton = document.getElementById('showDeleteUserFormButton');
+
+        const registerFormContainer = document.getElementById('registerFormContainer');
+        const updateUserFormContainer = document.getElementById('updateUserFormContainer');
+        const deleteUserFormContainer = document.getElementById('deleteUserFormContainer');
+
+        const hideRegisterFormButton = document.getElementById('hideRegisterFormButton');
+        const hideUpdateFormButton = document.getElementById('hideUpdateFormButton');
+        const hideDeleteUserFormButton = document.getElementById('hideDeleteUserFormButton');
+
+        const registerForm = document.getElementById('registerFormNew');
+        const registerMessage = document.getElementById('registerMessage');
+
+        const updateUserForm = document.getElementById('updateUserForm');
+        const updateUserMessage = document.getElementById('updateUserMessage');
+        const loadUserDataForUpdate = document.getElementById('loadUserDataForUpdate');
+
+        const deleteUserForm = document.getElementById('deleteUserForm');
+        const deleteUserMessage = document.getElementById('deleteUserMessage');
+
+        const loadUsersButton = document.getElementById('loadUsersButton');
+        const usersListDiv = document.getElementById('usersList');
+        const usersMessage = document.getElementById('usersMessage');
+        const viewUserForm = document.getElementById('viewUserForm');
+        const viewUserResultMessage = document.getElementById('viewUserResultMessage');
+        const viewUserResultContentDiv = document.getElementById('viewUserResultContentDiv');
+
+
+        // Elementos de la pestaña DUTS
+        const transferDutsForm = document.getElementById('transferDutsForm');
+        const transferMessage = document.getElementById('transferMessage');
+        const loadMyBalanceButton = document.getElementById('loadMyBalanceButton');
+        const myBalanceResultDiv = document.getElementById('myBalanceResult');
+        const loadTotalSentButton = document.getElementById('loadTotalSentButton');
+        const loadTotalReceivedButton = document.getElementById('loadTotalReceivedButton');
+        const totalDutsResultDiv = document.getElementById('totalDutsResult');
+
+        // Elementos de la pestaña EVENTOS
+        const eventManagementButtons = document.getElementById('eventManagementButtons');
+        const showCreateEventFormButton = document.getElementById('showCreateEventFormButton');
+        const showUpdateEventFormButton = document.getElementById('showUpdateEventFormButton');
+        const showDeleteEventFormButton = document.getElementById('showDeleteEventFormButton');
+        const createEventFormContainer = document.getElementById('createEventFormContainer');
+        const updateEventFormContainer = document.getElementById('updateEventFormContainer');
+        const deleteEventFormContainer = document.getElementById('deleteEventFormContainer');
+
+        const hideCreateEventFormButton = document.getElementById('hideCreateEventFormButton');
+        const hideUpdateEventFormButton = document.getElementById('hideUpdateEventFormButton');
+        const hideDeleteEventFormButton = document.getElementById('hideDeleteEventFormButton');
+
+        const createEventForm = document.getElementById('createEventForm');
+        const createEventMessage = document.getElementById('createEventMessage');
+
+        const updateEventForm = document.getElementById('updateEventForm');
+        const updateEventMessage = document.getElementById('updateEventMessage');
+        const loadEventDataForUpdate = document.getElementById('loadEventDataForUpdate');
+
+        const deleteEventForm = document.getElementById('deleteEventForm');
+        const deleteEventMessage = document.getElementById('deleteEventMessage');
+
+
+        const registerUnregisterEventForm = document.getElementById('registerUnregisterEventForm');
+        const registerEventButton = document.getElementById('registerEventButton');
+        const unregisterEventButton = document.getElementById('unregisterEventButton');
+        const eventRegMessage = document.getElementById('eventRegMessage');
+        const loadFutureEventsButton = document.getElementById('loadFutureEventsButton');
+        const futureEventsListDiv = document.getElementById('futureEventsList');
+        const futureEventsMessage = document.getElementById('futureEventsMessage');
+        const eventTypeSearchInput = document.getElementById('eventTypeSearch');
+        const searchEventsByTypeButton = document.getElementById('searchEventsByTypeButton');
+        const eventsByTypeResultDiv = document.getElementById('eventsByTypeResult');
+        const eventsByTypeMessage = document.getElementById('eventsByTypeMessage');
+        const minInscriptionsInput = document.getElementById('minInscriptions');
+        const loadPopularEventsButton = document.getElementById('loadPopularEventsButton');
+        const popularEventsListDiv = document.getElementById('popularEventsList');
+        const popularEventsMessage = document.getElementById('popularEventsMessage');
+
+        // Elementos de la pestaña ESTADÍSTICAS
+        // Nuevos elementos para promedios de DUTS
+        const dutsAveragesMessage = document.getElementById('dutsAveragesMessage');
+        const loadDailyAverageDutsButton = document.getElementById('loadDailyAverageDutsButton');
+        const dailyDutsAverageList = document.getElementById('dailyDutsAverageList');
+        const loadWeeklyAverageDutsButton = document.getElementById('loadWeeklyAverageDutsButton');
+        const weeklyDutsAverageList = document.getElementById('weeklyDutsAverageList');
+        const loadMonthlyAverageDutsButton = document.getElementById('loadMonthlyAverageDutsButton');
+        const monthlyDutsAverageList = document.getElementById('monthlyDutsAverageList');
+        const loadSemesterlyAverageDutsButton = document.getElementById('loadSemesterlyAverageDutsButton');
+        const semesterlyDutsAverageList = document.getElementById('semesterlyDutsAverageList');
+        const loadYearlyAverageDutsButton = document.getElementById('loadYearlyAverageDutsButton');
+        const yearlyDutsAverageList = document.getElementById('yearlyDutsAverageList');
+
+
+        const loadTopUsersButton = document.getElementById('loadTopUsersButton');
+        const topUsersListDiv = document.getElementById('topUsersList');
+        const topUsersMessage = document.getElementById('topUsersMessage');
+        const userEventCountForm = document.getElementById('userEventCountForm');
+        const userEventCountIdInput = document.getElementById('userEventCountId');
+        const userEventCountResultDiv = document.getElementById('userEventCountResult');
+        const userEventCountDisplayDiv = document.getElementById('userEventCountDisplay');
+        const eventUsersForm = document.getElementById('eventUsersForm');
+        const eventUsersIdInput = document.getElementById('eventUsersId');
+        const eventUsersListDiv = document.getElementById('eventUsersList');
+        const eventUsersMessage = document.getElementById('eventUsersMessage');
+        const loadUsersNoEventsButton = document.getElementById('loadUsersNoEventsButton');
+        const usersNoEventsListDiv = document.getElementById('usersNoEventsList');
+        const usersNoEventsMessage = document.getElementById('usersNoEventsMessage');
+
+        // Elementos para usuarios con menos DUTS
+        const loadLeastUsersButton = document.getElementById('loadLeastUsersButton');
+        const leastUsersListDiv = document.getElementById('leastUsersList');
+        const leastUsersMessage = document.getElementById('leastUsersMessage');
+
+
+        // Variable para almacenar el ID, username y rol del usuario logeado (simulando una sesión)
+        let currentUserId = localStorage.getItem('loggedInUserId');
+        let currentUsername = localStorage.getItem('loggedInUsername');
+        let currentUserRole = localStorage.getItem('loggedInUserRole');
+        let activeTab = 'dashboard'; // Pestaña activa por defecto al cargar
+
+        // --- Funciones de Utilidad ---
+        function showMessage(element, message, type, duration = 5000) {
+            if (element) {
+                element.textContent = message;
+                element.className = `message ${type} p-2 rounded-md mb-4 text-center`;
+                if (type === 'success') {
+                    element.classList.add('bg-green-100', 'text-green-800');
+                } else if (type === 'error') {
+                    element.classList.add('bg-red-100', 'text-red-800');
+                } else if (type === 'info') { // Para mensajes de información/cancelación
+                    element.classList.add('bg-blue-100', 'text-blue-800');
+                }
+                element.style.display = 'block';
+
+                if (duration > 0) {
+                    setTimeout(() => {
+                        element.style.display = 'none';
+                        element.textContent = '';
+                    }, duration);
+                }
+            }
+        }
+
+        function formatDutsAmount(amount) {
+            return parseFloat(amount).toLocaleString('es-CO', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function hideAllDutsAverageLists() {
+            if (dailyDutsAverageList) dailyDutsAverageList.innerHTML = '';
+            if (weeklyDutsAverageList) weeklyDutsAverageList.innerHTML = '';
+            if (monthlyDutsAverageList) monthlyDutsAverageList.innerHTML = '';
+            if (semesterlyDutsAverageList) semesterlyDutsAverageList.innerHTML = '';
+            if (yearlyDutsAverageList) yearlyDutsAverageList.innerHTML = '';
+        }
+
+        // Función para cambiar de pestaña y reiniciar formularios/resultados
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content-section').forEach(section => {
+                section.style.display = 'none';
+            });
+
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            const targetTabContent = document.getElementById(`${tabId}-tab`);
+            if (targetTabContent) {
+                targetTabContent.style.display = 'block';
+            }
+
+            const currentTabButton = document.querySelector(`.tab-button[data-tab="${tabId}"]`);
+            if (currentTabButton) {
+                currentTabButton.classList.add('active');
+            }
+
+            activeTab = tabId;
+
+            // --- Lógica de reinicio de formularios y resultados por pestaña ---
+
+            // Pestaña de Usuarios
+            if (tabId === 'users') {
+                // Ocultar todos los formularios de gestión de usuarios
+                if (registerFormContainer) registerFormContainer.style.display = 'none';
+                if (updateUserFormContainer) updateUserFormContainer.style.display = 'none';
+                if (deleteUserFormContainer) deleteUserFormContainer.style.display = 'none';
+
+                // Limpiar formularios
+                if (registerForm) registerForm.reset();
+                if (updateUserForm) updateUserForm.reset();
+                if (deleteUserForm) deleteUserForm.reset();
+                if (viewUserForm) viewUserForm.reset();
+
+                // Limpiar mensajes y resultados
+                if (registerMessage) showMessage(registerMessage, '', '');
+                if (updateUserMessage) showMessage(updateUserMessage, '', '');
+                if (deleteUserMessage) showMessage(deleteUserMessage, '', '');
+                if (viewUserResultMessage) showMessage(viewUserResultMessage, '', '');
+                if (usersMessage) showMessage(usersMessage, '', '');
+                if (viewUserResultContentDiv) {
+                    viewUserResultContentDiv.innerHTML = '';
+                    viewUserResultContentDiv.style.display = 'none';
+                }
+                if (usersListDiv) usersListDiv.innerHTML = '';
+            }
+
+            // Pestaña de DUTS
+            if (tabId === 'duts') {
+                if (transferDutsForm) transferDutsForm.reset();
+                if (transferMessage) showMessage(transferMessage, '', '');
+                if (myBalanceResultDiv) showMessage(myBalanceResultDiv, '', '');
+                if (totalDutsResultDiv) showMessage(totalDutsResultDiv, '', '');
+            }
+
+            // Pestaña de Eventos
+            if (tabId === 'events') {
+                // Ocultar todos los formularios de gestión de eventos
+                if (createEventFormContainer) createEventFormContainer.style.display = 'none';
+                if (updateEventFormContainer) updateEventFormContainer.style.display = 'none';
+                if (deleteEventFormContainer) deleteEventFormContainer.style.display = 'none';
+
+                // Reiniciar formularios de eventos
+                if (createEventForm) createEventForm.reset();
+                if (updateEventForm) updateEventForm.reset();
+                if (deleteEventForm) deleteEventForm.reset();
+                if (registerUnregisterEventForm) registerUnregisterEventForm.reset();
+                if (eventTypeSearchInput) eventTypeSearchInput.value = '';
+                if (minInscriptionsInput) minInscriptionsInput.value = '1';
+
+                // Limpiar mensajes y resultados de eventos
+                if (createEventMessage) showMessage(createEventMessage, '', '');
+                if (updateEventMessage) showMessage(updateEventMessage, '', '');
+                if (deleteEventMessage) showMessage(deleteEventMessage, '', '');
+                if (eventRegMessage) showMessage(eventRegMessage, '', '');
+                if (futureEventsMessage) showMessage(futureEventsMessage, '', '');
+                if (eventsByTypeMessage) showMessage(eventsByTypeMessage, '', '');
+                if (popularEventsMessage) showMessage(popularEventsMessage, '', '');
+                if (futureEventsListDiv) futureEventsListDiv.innerHTML = '';
+                if (eventsByTypeResultDiv) eventsByTypeResultDiv.innerHTML = '';
+                if (popularEventsListDiv) popularEventsListDiv.innerHTML = '';
+            }
+
+            // Pestaña de Estadísticas
+            if (tabId === 'stats') {
+                if (userEventCountForm) userEventCountForm.reset();
+                if (eventUsersForm) eventUsersForm.reset();
+
+                if (topUsersMessage) showMessage(topUsersMessage, '', '');
+                if (leastUsersMessage) showMessage(leastUsersMessage, '', '');
+                if (userEventCountResultDiv) showMessage(userEventCountResultDiv, '', '');
+                if (eventUsersMessage) showMessage(eventUsersMessage, '', '');
+                if (usersNoEventsMessage) showMessage(usersNoEventsMessage, '', '');
+                if (dutsAveragesMessage) showMessage(dutsAveragesMessage, '', ''); // Limpiar mensajes de promedios
+
+                if (topUsersListDiv) topUsersListDiv.innerHTML = '';
+                if (leastUsersListDiv) leastUsersListDiv.innerHTML = '';
+                if (userEventCountDisplayDiv) {
+                    userEventCountDisplayDiv.textContent = '';
+                    userEventCountDisplayDiv.style.display = 'none';
+                }
+                if (eventUsersListDiv) eventUsersListDiv.innerHTML = '';
+                if (usersNoEventsListDiv) usersNoEventsListDiv.innerHTML = '';
+                hideAllDutsAverageLists(); // Limpiar todas las listas de promedios
+            }
+        }
+
+        function updateLoginUI() {
+            // Secciones de gestión de usuarios y eventos
+            const userRegisterUpdateDeleteContainer = userManagementButtons;
+            const eventManageButtonsContainer = eventManagementButtons;
+
+            if (currentUserId && currentUsername) {
+                if (loginForm) loginForm.style.display = 'none';
+                if (userInfoDiv) userInfoDiv.style.display = 'flex';
+                if (loggedInUsernameSpan) loggedInUsernameSpan.textContent = currentUsername;
+                if (loggedInUserIdSpan) loggedInUserIdSpan.textContent = currentUserId;
+
+                if (dashboardUserIdSpan) dashboardUserIdSpan.textContent = currentUserId;
+                if (dashboardUsernameSpan) dashboardUsernameSpan.textContent = currentUsername;
+                if (dashboardSummaryDiv) dashboardSummaryDiv.style.display = 'block';
+
+                loadMyBalance(true);
+
+                // Control de visibilidad para botones y formularios de gestión de usuarios (solo para admins)
+                if (userRegisterUpdateDeleteContainer) {
+                    if (currentUserRole === 'admin') {
+                        userRegisterUpdateDeleteContainer.style.display = 'flex';
+                    } else {
+                        userRegisterUpdateDeleteContainer.style.display = 'none';
+                        // Ocultar formularios si el rol no es admin
+                        if (registerFormContainer) registerFormContainer.style.display = 'none';
+                        if (updateUserFormContainer) updateUserFormContainer.style.display = 'none';
+                        if (deleteUserFormContainer) deleteUserFormContainer.style.display = 'none';
+                    }
+                }
+
+                // Control de visibilidad para botones y formularios de gestión de eventos (solo para admins)
+                if (eventManageButtonsContainer) {
+                    if (currentUserRole === 'admin') {
+                        eventManageButtonsContainer.style.display = 'flex';
+                    } else {
+                        eventManageButtonsContainer.style.display = 'none';
+                        // Ocultar formularios si el rol no es admin
+                        if (createEventFormContainer) createEventFormContainer.style.display = 'none';
+                        if (updateEventFormContainer) updateEventFormContainer.style.display = 'none';
+                        if (deleteEventFormContainer) deleteEventFormContainer.style.display = 'none';
+                    }
+                }
+
+            } else {
+                // Si no hay usuario logeado
+                if (loginForm) loginForm.style.display = 'block';
+                if (userInfoDiv) userInfoDiv.style.display = 'none';
+                if (dashboardSummaryDiv) dashboardSummaryDiv.style.display = 'none';
+
+                if (loggedInUsernameSpan) loggedInUsernameSpan.textContent = '';
+                if (loggedInUserIdSpan) loggedInUserIdSpan.textContent = '';
+                if (dutsProgressSpan) dutsProgressSpan.textContent = '0';
+                if (dashboardDutsBalanceSpan) dashboardDutsBalanceSpan.textContent = '0';
+
+                // Ocultar todas las secciones de gestión de usuarios y eventos
+                if (userRegisterUpdateDeleteContainer) userRegisterUpdateDeleteContainer.style.display = 'none';
+                if (registerFormContainer) registerFormContainer.style.display = 'none';
+                if (updateUserFormContainer) updateUserFormContainer.style.display = 'none';
+                if (deleteUserFormContainer) deleteUserFormContainer.style.display = 'none';
+
+                if (eventManageButtonsContainer) eventManageButtonsContainer.style.display = 'none';
+                if (createEventFormContainer) createEventFormContainer.style.display = 'none';
+                if (updateEventFormContainer) updateEventFormContainer.style.display = 'none';
+                if (deleteEventFormContainer) deleteEventFormContainer.style.display = 'none';
+            }
+        }
+
+        // --- Event Listeners y Lógica ---
+
+        // Event Listeners para los botones de las pestañas
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.dataset.tab;
+                switchTab(tabId);
+            });
+        });
+
+        // LÓGICA DE VISIBILIDAD PARA FORMULARIOS DE USUARIOS
+        if (showRegisterFormButton) {
+            showRegisterFormButton.addEventListener('click', () => {
+                if (registerFormContainer) registerFormContainer.style.display = 'block';
+                if (updateUserFormContainer) updateUserFormContainer.style.display = 'none';
+                if (deleteUserFormContainer) deleteUserFormContainer.style.display = 'none';
+                if (registerForm) registerForm.reset();
+                if (registerMessage) showMessage(registerMessage, '', '');
+            });
+        }
+
+        if (hideRegisterFormButton) {
+            hideRegisterFormButton.addEventListener('click', () => {
+                if (registerFormContainer) registerFormContainer.style.display = 'none';
+                if (registerForm) registerForm.reset();
+                if (registerMessage) showMessage(registerMessage, '', '');
+            });
+        }
+
+        if (showUpdateFormButton) {
+            showUpdateFormButton.addEventListener('click', () => {
+                if (updateUserFormContainer) updateUserFormContainer.style.display = 'block';
+                if (registerFormContainer) registerFormContainer.style.display = 'none';
+                if (deleteUserFormContainer) deleteUserFormContainer.style.display = 'none';
+                if (updateUserForm) updateUserForm.reset();
+                if (updateUserMessage) showMessage(updateUserMessage, '', '');
+            });
+        }
+
+        if (hideUpdateFormButton) {
+            hideUpdateFormButton.addEventListener('click', () => {
+                if (updateUserFormContainer) updateUserFormContainer.style.display = 'none';
+                if (updateUserForm) updateUserForm.reset();
+                if (updateUserMessage) showMessage(updateUserMessage, '', '');
+            });
+        }
+
+        if (showDeleteUserFormButton) {
+            showDeleteUserFormButton.addEventListener('click', () => {
+                if (deleteUserFormContainer) deleteUserFormContainer.style.display = 'block';
+                if (registerFormContainer) registerFormContainer.style.display = 'none';
+                if (updateUserFormContainer) updateUserFormContainer.style.display = 'none';
+                if (deleteUserForm) deleteUserForm.reset();
+                if (deleteUserMessage) showMessage(deleteUserMessage, '', '');
+            });
+        }
+
+        if (hideDeleteUserFormButton) {
+            hideDeleteUserFormButton.addEventListener('click', () => {
+                if (deleteUserFormContainer) deleteUserFormContainer.style.display = 'none';
+                if (deleteUserForm) deleteUserForm.reset();
+                if (deleteUserMessage) showMessage(deleteUserMessage, '', '');
+            });
+        }
+
+        // LÓGICA DE VISIBILIDAD PARA FORMULARIOS DE EVENTOS
+        if (showCreateEventFormButton) {
+            showCreateEventFormButton.addEventListener('click', () => {
+                if (createEventFormContainer) createEventFormContainer.style.display = 'block';
+                if (updateEventFormContainer) updateEventFormContainer.style.display = 'none';
+                if (deleteEventFormContainer) deleteEventFormContainer.style.display = 'none';
+                if (createEventForm) createEventForm.reset();
+                if (createEventMessage) showMessage(createEventMessage, '', '');
+            });
+        }
+
+        if (hideCreateEventFormButton) {
+            hideCreateEventFormButton.addEventListener('click', () => {
+                if (createEventFormContainer) createEventFormContainer.style.display = 'none';
+                if (createEventForm) createEventForm.reset();
+                if (createEventMessage) showMessage(createEventMessage, '', '');
+            });
+        }
+
+        if (showUpdateEventFormButton) {
+            showUpdateEventFormButton.addEventListener('click', () => {
+                if (updateEventFormContainer) updateEventFormContainer.style.display = 'block';
+                if (createEventFormContainer) createEventFormContainer.style.display = 'none';
+                if (deleteEventFormContainer) deleteEventFormContainer.style.display = 'none';
+                if (updateEventForm) updateEventForm.reset();
+                if (updateEventMessage) showMessage(updateEventMessage, '', '');
+            });
+        }
+
+        if (hideUpdateEventFormButton) {
+            hideUpdateEventFormButton.addEventListener('click', () => {
+                if (updateEventFormContainer) updateEventFormContainer.style.display = 'none';
+                if (updateEventForm) updateEventForm.reset();
+                if (updateEventMessage) showMessage(updateEventMessage, '', '');
+            });
+        }
+
+        if (showDeleteEventFormButton) {
+            showDeleteEventFormButton.addEventListener('click', () => {
+                if (deleteEventFormContainer) deleteEventFormContainer.style.display = 'block';
+                if (createEventFormContainer) createEventFormContainer.style.display = 'none';
+                if (updateEventFormContainer) updateEventFormContainer.style.display = 'none';
+                if (deleteEventForm) deleteEventForm.reset();
+                if (deleteEventMessage) showMessage(deleteEventMessage, '', '');
+            });
+        }
+
+        if (hideDeleteEventFormButton) {
+            hideDeleteEventFormButton.addEventListener('click', () => {
+                if (deleteEventFormContainer) deleteEventFormContainer.style.display = 'none';
+                if (deleteEventForm) deleteEventForm.reset();
+                if (deleteEventMessage) showMessage(deleteEventMessage, '', '');
+            });
+        }
+
+
+        // 1. Registro de Usuario
+        if (registerForm) {
+            registerForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const userData = {
+                    nombres: document.getElementById('reg_nombres').value,
+                    apellidos: document.getElementById('reg_apellidos').value,
+                    email: document.getElementById('reg_email').value,
+                    ciudad: document.getElementById('reg_ciudad').value,
+                    pais: document.getElementById('reg_pais').value,
+                    descripcion: document.getElementById('reg_descripcion').value,
+                    intereses: document.getElementById('reg_intereses').value,
+                    programa: document.getElementById('reg_programa').value,
+                    semestre: parseInt(document.getElementById('reg_semestre').value),
+                    username: document.getElementById('reg_username').value,
+                    password: document.getElementById('reg_password').value,
+                    rol: document.getElementById('reg_rol').value
+                };
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}auth/register.php`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(userData)
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showMessage(registerMessage, data.message, 'success');
+                        registerForm.reset();
+                    } else {
+                        showMessage(registerMessage, data.message || 'Error al registrar usuario.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error de red al registrar:', error);
+                    showMessage(registerMessage, 'Error de conexión con el servidor.', 'error');
+                }
+            });
+        }
+
+        // 2. Inicio de Sesión
+        if (loginForm) {
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const username = document.getElementById('login_username').value;
+                const password = document.getElementById('login_password').value;
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}auth/login.php`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showMessage(loginMessage, data.message, 'success');
+                        currentUserId = data.user_id;
+                        currentUsername = data.username;
+                        currentUserRole = data.rol;
+                        localStorage.setItem('loggedInUserId', currentUserId);
+                        localStorage.setItem('loggedInUsername', currentUsername);
+                        localStorage.setItem('loggedInUserRole', currentUserRole);
+                        updateLoginUI();
+                        loginForm.reset();
+                        switchTab('dashboard');
+                    } else {
+                        showMessage(loginMessage, data.message || 'Credenciales incorrectas.', 'error');
+                        currentUserId = null;
+                        currentUsername = null;
+                        currentUserRole = null;
+                        localStorage.removeItem('loggedInUserId');
+                        localStorage.removeItem('loggedInUsername');
+                        localStorage.removeItem('loggedInUserRole');
+                        updateLoginUI();
+                    }
+                } catch (error) {
+                    console.error('Error de red al iniciar sesión:', error);
+                    showMessage(loginMessage, 'Error de conexión con el servidor.', 'error');
+                }
+            });
+        }
+
+        // 3. Cerrar Sesión
+        if (logoutButton) {
+            logoutButton.addEventListener('click', () => {
+                currentUserId = null;
+                currentUsername = null;
+                currentUserRole = null;
+                localStorage.removeItem('loggedInUserId');
+                localStorage.removeItem('loggedInUsername');
+                localStorage.removeItem('loggedInUserRole');
+                updateLoginUI();
+                showMessage(loginMessage, 'Sesión cerrada.', 'success');
+                switchTab('users');
+            });
+        }
+
+        // 4. Listar Todos los Usuarios
+        if (loadUsersButton) {
+            loadUsersButton.addEventListener('click', async () => {
+                try {
+                    const response = await fetch(`${API_BASE_URL}users/read.php`);
+                    const data = await response.json();
+
+                    if (response.ok && data.message !== 'No users found.') {
+                        if (usersMessage) usersMessage.style.display = 'none';
+                        let usersHtml = '<table class="min-w-full bg-white border border-gray-200 rounded-md"><thead><tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal"><th class="py-3 px-6 text-left">ID</th><th class="py-3 px-6 text-left">Username</th><th class="py-3 px-6 text-left">Nombres</th><th class="py-3 px-6 text-left">Email</th><th class="py-3 px-6 text-left">Rol</th><th class="py-3 px-6 text-left">Ciudad</th></tr></thead><tbody>';
+                        data.records.forEach(user => {
+                            usersHtml += `
+                                <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                    <td class="py-3 px-6 text-left whitespace-nowrap">${user.id}</td>
+                                    <td class="py-3 px-6 text-left">${user.username}</td>
+                                    <td class="py-3 px-6 text-left">${user.nombres} ${user.apellidos}</td>
+                                    <td class="py-3 px-6 text-left">${user.email}</td>
+                                    <td class="py-3 px-6 text-left">${user.rol}</td>
+                                    <td class="py-3 px-6 text-left">${user.ciudad}</td>
+                                </tr>
+                            `;
+                        });
+                        usersHtml += '</tbody></table>';
+                        if (usersListDiv) usersListDiv.innerHTML = usersHtml;
+                    } else {
+                        if (usersMessage) showMessage(usersMessage, data.message || 'No se pudieron cargar los usuarios.', 'error');
+                        if (usersListDiv) usersListDiv.innerHTML = '';
+                    }
+                } catch (error) {
+                    console.error('Error de red al cargar usuarios:', error);
+                    if (usersMessage) showMessage(usersMessage, 'Error de conexión al cargar usuarios.', 'error');
+                    if (usersListDiv) usersListDiv.innerHTML = '';
+                }
+            });
+        }
+
+        // 5. Ver Perfil de un Usuario Específico
+        if (viewUserForm) {
+            viewUserForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const userId = document.getElementById('view_userId').value;
+                if (!userId) {
+                    showMessage(viewUserResultMessage, 'Por favor, ingresa un ID de usuario para ver el perfil.', 'error');
+                    if (viewUserResultContentDiv) {
+                        viewUserResultContentDiv.innerHTML = '';
+                        viewUserResultContentDiv.style.display = 'none';
+                    }
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}users/read_single.php?id=${userId}`);
+                    const responseText = await response.text();
+                    let data;
+                    try {
+                        data = JSON.parse(responseText);
+                    } catch (jsonError) {
+                        console.error('Error al parsear la respuesta de read_single.php como JSON:', jsonError, 'Respuesta recibida:', responseText);
+                        showMessage(viewUserResultMessage, `Error del servidor: la respuesta no es JSON válido. Recibido: "${responseText.substring(0, 100)}..." (ver consola para más detalles).`, 'error');
+                        if (viewUserResultContentDiv) viewUserResultContentDiv.style.display = 'none';
+                        return;
+                    }
+
+                    if (response.ok && data.id) {
+                        if (viewUserResultMessage) viewUserResultMessage.style.display = 'none';
+                        if (viewUserResultContentDiv) {
+                            viewUserResultContentDiv.innerHTML = `
+                                <p><strong>ID:</strong> ${data.id}</p>
+                                <p><strong>Usuario:</strong> ${data.username}</p>
+                                <p><strong>Nombres:</strong> ${data.nombres} ${data.apellidos}</p>
+                                <p><strong>Email:</strong> ${data.email}</p>
+                                <p><strong>Rol:</strong> ${data.rol}</p>
+                                <p><strong>Ciudad:</strong> ${data.ciudad || 'N/A'}, <strong>País:</strong> ${data.pais || 'N/A'}</p>
+                                <p><strong>Descripción:</strong> ${data.descripcion || 'N/A'}</p>
+                                <p><strong>Intereses:</strong> ${data.intereses || 'N/A'}</p>
+                                <p><strong>Programa:</strong> ${data.programa || 'N/A'}</p>
+                                <p><strong>Semestre:</strong> ${data.semestre || 'N/A'}</p>
+                                <p><strong>Creado el:</strong> ${data.created_at || 'N/A'}</p>
+                            `;
+                            viewUserResultContentDiv.style.display = 'block';
+                        }
+                    } else {
+                        if (viewUserResultMessage) showMessage(viewUserResultMessage, data.message || 'Usuario no encontrado o error en el servidor.', 'error');
+                        if (viewUserResultContentDiv) {
+                            viewUserResultContentDiv.innerHTML = '';
+                            viewUserResultContentDiv.style.display = 'none';
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error de red al ver perfil de usuario:', error);
+                    if (viewUserResultMessage) showMessage(viewUserResultMessage, 'Error de conexión al buscar usuario. Revisa que el servidor PHP esté funcionando y que la API esté accesible.', 'error');
+                    if (viewUserResultContentDiv) {
+                        viewUserResultContentDiv.innerHTML = '';
+                        viewUserResultContentDiv.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        // 6. Actualizar Usuario
+        if (updateUserForm) {
+            updateUserForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const userId = document.getElementById('update_userId').value;
+                const userData = {
+                    id: userId,
+                    nombres: document.getElementById('update_nombres').value,
+                    apellidos: document.getElementById('update_apellidos').value,
+                    email: document.getElementById('update_email').value,
+                    ciudad: document.getElementById('update_ciudad').value,
+                    pais: document.getElementById('update_pais').value,
+                    descripcion: document.getElementById('update_descripcion').value,
+                    intereses: document.getElementById('update_intereses').value,
+                    programa: document.getElementById('update_programa').value,
+                    semestre: document.getElementById('update_semestre').value,
+                    username: document.getElementById('update_username').value,
+                    password: document.getElementById('update_password').value,
+                    rol: document.getElementById('update_rol').value
+                };
+
+                const filteredUserData = {};
+                for (const key in userData) {
+                    if (key === 'id' || (userData[key] !== '' && userData[key] !== null && userData[key] !== undefined)) {
+                        filteredUserData[key] = userData[key];
+                    }
+                }
+                if (userData.password === '') {
+                    delete filteredUserData.password;
+                }
+                if (userData.rol === '') {
+                    delete filteredUserData.rol;
+                }
+
+
+                if (!filteredUserData.id) {
+                    if (updateUserMessage) showMessage(updateUserMessage, 'El ID de usuario es requerido para la actualización.', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}users/update.php`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(filteredUserData)
+                    });
+
+                    const responseText = await response.text();
+                    let data;
+                    try {
+                        data = JSON.parse(responseText);
+                    } catch (e) {
+                        console.error("Error al parsear JSON:", e, "Respuesta del servidor:", responseText);
+                        showMessage(updateUserMessage, 'Error de servidor: Respuesta inválida (no es JSON). Consulta la consola.', 'error');
+                        return;
+                    }
+
+
+                    if (response.ok) {
+                        if (updateUserMessage) showMessage(updateUserMessage, data.message, 'success');
+                        document.getElementById('update_userId').value = '';
+                        document.getElementById('update_nombres').value = '';
+                        document.getElementById('update_apellidos').value = '';
+                        document.getElementById('update_email').value = '';
+                        document.getElementById('update_ciudad').value = '';
+                        document.getElementById('update_pais').value = '';
+                        document.getElementById('update_descripcion').value = '';
+                        document.getElementById('update_intereses').value = '';
+                        document.getElementById('update_programa').value = '';
+                        document.getElementById('update_semestre').value = '';
+                        document.getElementById('update_username').value = '';
+                        document.getElementById('update_password').value = '';
+                        document.getElementById('update_rol').value = '';
+
+                        if (currentUserId === userId) {
+                            loadMyBalance(true);
+                        }
+                    } else {
+                        if (updateUserMessage) showMessage(updateUserMessage, data.message || 'Error al actualizar usuario.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error de red al actualizar usuario:', error);
+                    showMessage(updateUserMessage, 'Error de conexión con el servidor o problema de red.', 'error');
+                }
+            });
+        }
+
+        // Función para cargar datos de usuario en el formulario de actualización
+        if (loadUserDataForUpdate) {
+            loadUserDataForUpdate.addEventListener('click', async () => {
+                const userId = document.getElementById('update_userId').value;
+                if (!userId) {
+                    if (updateUserMessage) showMessage(updateUserMessage, 'Ingresa un ID de usuario para cargar los datos.', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}users/read_single.php?id=${userId}`);
+                    const data = await response.json();
+
+                    if (response.ok && data.id) {
+                        document.getElementById('update_nombres').value = data.nombres || '';
+                        document.getElementById('update_apellidos').value = data.apellidos || '';
+                        document.getElementById('update_email').value = data.email || '';
+                        document.getElementById('update_ciudad').value = data.ciudad || '';
+                        document.getElementById('update_pais').value = data.pais || '';
+                        document.getElementById('update_descripcion').value = data.descripcion || '';
+                        document.getElementById('update_intereses').value = data.intereses || '';
+                        document.getElementById('update_programa').value = data.programa || '';
+                        document.getElementById('update_semestre').value = data.semestre || '';
+                        document.getElementById('update_username').value = data.username || '';
+                        document.getElementById('update_password').value = '';
+                        document.getElementById('update_rol').value = data.rol || '';
+
+                        if (updateUserMessage) showMessage(updateUserMessage, 'Datos de usuario cargados exitosamente. Ahora puedes modificarlos.', 'success');
+                    } else {
+                        if (updateUserMessage) showMessage(updateUserMessage, data.message || 'Usuario no encontrado.', 'error');
+                        if (updateUserForm) updateUserForm.reset();
+                        document.getElementById('update_userId').value = userId;
+                    }
+                }
+                catch (error) {
+                    console.error('Error de red al cargar datos del usuario para actualización:', error);
+                    if (updateUserMessage) showMessage(updateUserMessage, 'Error de conexión al cargar datos.', 'error');
+                    if (updateUserForm) updateUserForm.reset();
+                    document.getElementById('update_userId').value = userId;
+                }
+            });
+        }
+
+        // 7. Eliminar Usuario
+        if (deleteUserForm) {
+            deleteUserForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                if (!currentUserId || currentUserRole !== 'admin') {
+                    showMessage(deleteUserMessage, 'Acceso denegado. Solo los administradores pueden eliminar usuarios.', 'error');
+                    return;
+                }
+
+                const userIdToDelete = document.getElementById('delete_userId').value;
+                if (!userIdToDelete) {
+                    showMessage(deleteUserMessage, 'Por favor, ingresa el ID del usuario a eliminar.', 'error');
+                    return;
+                }
+
+                if (!confirm(`¿Estás seguro de que quieres eliminar el usuario con ID: ${userIdToDelete}? Esta acción es irreversible y eliminará también sus transacciones DUTS y registros de eventos.`)) {
+                    showMessage(deleteUserMessage, 'Eliminación de usuario cancelada.', 'info');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}users/delete.php`, {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            id: userIdToDelete,
+                            requesting_user_id: currentUserId,
+                            rol: currentUserRole
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showMessage(deleteUserMessage, data.message, 'success');
+                        if (deleteUserForm) deleteUserForm.reset();
+                        if (currentUserId === userIdToDelete) {
+                            logoutButton.click();
+                        }
+                    } else {
+                        showMessage(deleteUserMessage, data.message || 'Error al eliminar el usuario.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error de red al eliminar usuario:', error);
+                    showMessage(deleteUserMessage, 'Error de conexión con el servidor o problema de red.', 'error');
+                }
+            });
+        }
+
+
+        // --- FUNCIONALIDADES DUTS ---
+
+        // 8. Transferir DUTS
+        if (transferDutsForm) {
+            transferDutsForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!currentUserId) {
+                    if (transferMessage) showMessage(transferMessage, 'Debes iniciar sesión para transferir DUTS.', 'error');
+                    return;
+                }
+
+                const destinationId = document.getElementById('transfer_dest_id').value;
+                const amount = document.getElementById('transfer_amount').value;
+
+                if (currentUserId === destinationId) {
+                    if (transferMessage) showMessage(transferMessage, 'No puedes transferir DUTS a ti mismo.', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}duts/transfer.php`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            id_origen: currentUserId,
+                            id_destino: destinationId,
+                            cantidad: amount
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showMessage(transferMessage, data.message, 'success');
+                        if (transferDutsForm) transferDutsForm.reset();
+                        loadMyBalance(true);
+                    } else {
+                        showMessage(transferMessage, data.message || 'Error al transferir DUTS.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error de red al transferir DUTS:', error);
+                    showMessage(transferMessage, 'Error de conexión con el servidor.', 'error');
+                }
+            });
+        }
+
+        // 9. Cargar Mi Saldo DUTS (y progreso de graduación)
+        async function loadMyBalance(silent = false) {
+            if (!currentUserId) {
+                if (!silent && myBalanceResultDiv) showMessage(myBalanceResultDiv, 'Debes iniciar sesión para ver tu saldo.', 'error', 0);
+                if (dutsProgressSpan) dutsProgressSpan.textContent = '0';
+                if (dashboardDutsBalanceSpan) dashboardDutsBalanceSpan.textContent = '0';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}duts/balance.php?user_id=${currentUserId}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    const balance = data.balance;
+                    const formattedBalance = formatDutsAmount(balance);
+                    if (!silent && myBalanceResultDiv) showMessage(myBalanceResultDiv, `Tu saldo DUTS actual es: ${formattedBalance}`, 'success', 0);
+                    if (dutsProgressSpan) dutsProgressSpan.textContent = formattedBalance;
+                    if (dashboardDutsBalanceSpan) dashboardDutsBalanceSpan.textContent = formattedBalance;
+                } else {
+                    if (!silent && myBalanceResultDiv) showMessage(myBalanceResultDiv, data.message || 'No se pudo cargar tu saldo.', 'error', 0);
+                    if (dutsProgressSpan) dutsProgressSpan.textContent = '0';
+                    if (dashboardDutsBalanceSpan) dashboardDutsBalanceSpan.textContent = '0';
+                }
+            } catch (error) {
+                console.error('Error de red al cargar balance:', error);
+                if (!silent && myBalanceResultDiv) showMessage(myBalanceResultDiv, 'Error de conexión al cargar balance.', 'error', 0);
+                if (dutsProgressSpan) dutsProgressSpan.textContent = '0';
+                if (dashboardDutsBalanceSpan) dashboardDutsBalanceSpan.textContent = '0';
+            }
+        }
+        if (loadMyBalanceButton) {
+            loadMyBalanceButton.addEventListener('click', () => loadMyBalance(false));
+        }
+
+
+        // 10. Total DUTS Enviados
+        if (loadTotalSentButton) {
+            loadTotalSentButton.addEventListener('click', async () => {
+                if (!currentUserId) {
+                    if (totalDutsResultDiv) showMessage(totalDutsResultDiv, 'Debes iniciar sesión para ver el total enviado.', 'error', 0);
+                    return;
+                }
+                try {
+                    const response = await fetch(`${API_BASE_URL}duts/total_sent.php?user_id=${currentUserId}`);
+                    const data = await response.json();
+                    if (response.ok) {
+                        const formattedTotal = formatDutsAmount(data.total_duts_enviados);
+                        if (totalDutsResultDiv) showMessage(totalDutsResultDiv, `Total DUTS enviados por ti: ${formattedTotal}`, 'success', 0);
+                    } else {
+                        if (totalDutsResultDiv) showMessage(totalDutsResultDiv, data.message || 'Error al cargar total enviado.', 'error', 0);
+                    }
+                } catch (error) {
+                    console.error('Error al cargar total enviado:', error);
+                    if (totalDutsResultDiv) showMessage(totalDutsResultDiv, 'Error de conexión.', 'error', 0);
+                }
+            });
+        }
+
+        // 11. Total DUTS Recibidos
+        if (loadTotalReceivedButton) {
+            loadTotalReceivedButton.addEventListener('click', async () => {
+                if (!currentUserId) {
+                    if (totalDutsResultDiv) showMessage(totalDutsResultDiv, 'Debes iniciar sesión para ver el total recibido.', 'error', 0);
+                    return;
+                }
+                try {
+                    const response = await fetch(`${API_BASE_URL}duts/total_received.php?user_id=${currentUserId}`);
+                    const data = await response.json();
+                    if (response.ok) {
+                        const formattedTotal = formatDutsAmount(data.total_duts_recibidos);
+                        if (totalDutsResultDiv) showMessage(totalDutsResultDiv, `Total DUTS recibidos por ti: ${formattedTotal}`, 'success', 0);
+                    } else {
+                        if (totalDutsResultDiv) showMessage(totalDutsResultDiv, data.message || 'Error al cargar total recibido.', 'error', 0);
+                    }
+                } catch (error) {
+                    console.error('Error al cargar total recibido:', error);
+                    if (totalDutsResultDiv) showMessage(totalDutsResultDiv, 'Error de conexión.', 'error', 0);
+                }
+            });
+        }
+
+        // --- FUNCIONALIDADES EVENTOS ---
+
+        // 12. Crear Evento
+        if (createEventForm) {
+            createEventForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!currentUserId || currentUserRole !== 'admin') {
+                    if (createEventMessage) showMessage(createEventMessage, 'Acceso denegado. Solo los administradores pueden crear eventos.', 'error');
+                    return;
+                }
+
+                const eventData = {
+                    nombre: document.getElementById('event_nombre').value,
+                    descripcion: document.getElementById('event_descripcion').value,
+                    fecha: document.getElementById('event_fecha').value,
+                    tipo_evento: document.getElementById('event_tipo').value,
+                    id_usuario: currentUserId
+                };
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}events/create.php`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(eventData)
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showMessage(createEventMessage, data.message, 'success');
+                        if (createEventForm) createEventForm.reset();
+                    } else {
+                        showMessage(createEventMessage, data.message || 'Error al crear evento.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error de red al crear evento:', error);
+                    showMessage(createEventMessage, 'Error de conexión con el servidor.', 'error');
+                }
+            });
+        }
+
+        // 13. Actualizar Evento (Cargar datos)
+        if (loadEventDataForUpdate) {
+            loadEventDataForUpdate.addEventListener('click', async () => {
+                const eventId = document.getElementById('update_eventId').value;
+                if (!eventId) {
+                    showMessage(updateEventMessage, 'Ingresa un ID de evento para cargar los datos.', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}events/read_single.php?id=${eventId}`);
+                    const data = await response.json();
+
+                    if (response.ok && data.id) {
+                        document.getElementById('update_event_nombre').value = data.nombre || '';
+                        document.getElementById('update_event_descripcion').value = data.descripcion || '';
+                        document.getElementById('update_event_fecha').value = data.fecha || '';
+                        document.getElementById('update_event_tipo').value = data.tipo_evento || '';
+
+                        showMessage(updateEventMessage, 'Datos del evento cargados exitosamente. Ahora puedes modificarlos.', 'success');
+                    } else {
+                        showMessage(updateEventMessage, data.message || 'Evento no encontrado.', 'error');
+                        if (updateEventForm) updateEventForm.reset();
+                        document.getElementById('update_eventId').value = eventId;
+                    }
+                } catch (error) {
+                    console.error('Error de red al cargar datos del evento para actualización:', error);
+                    showMessage(updateEventMessage, 'Error de conexión al cargar datos del evento.', 'error');
+                    if (updateEventForm) updateEventForm.reset();
+                    document.getElementById('update_eventId').value = eventId;
+                }
+            });
+        }
+
+        // 14. Actualizar Evento (Enviar datos)
+        if (updateEventForm) {
+            updateEventForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!currentUserId || currentUserRole !== 'admin') {
+                    showMessage(updateEventMessage, 'Acceso denegado. Solo los administradores pueden actualizar eventos.', 'error');
+                    return;
+                }
+
+                const eventId = document.getElementById('update_eventId').value;
+                const eventData = {
+                    id: eventId,
+                    nombre: document.getElementById('update_event_nombre').value,
+                    descripcion: document.getElementById('update_event_descripcion').value,
+                    fecha: document.getElementById('update_event_fecha').value,
+                    tipo_evento: document.getElementById('update_event_tipo').value,
+                    id_usuario: currentUserId
+                };
+
+                if (!eventId) {
+                    showMessage(updateEventMessage, 'El ID del evento es requerido para la actualización.', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}events/update.php`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(eventData)
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showMessage(updateEventMessage, data.message, 'success');
+                        if (updateEventForm) updateEventForm.reset();
+                    } else {
+                        showMessage(updateEventMessage, data.message || 'Error al actualizar evento.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error de red al actualizar evento:', error);
+                    showMessage(updateEventMessage, 'Error de conexión con el servidor o problema de red.', 'error');
+                }
+            });
+        }
+
+        // 15. Eliminar Evento
+        if (deleteEventForm) {
+            deleteEventForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!currentUserId || currentUserRole !== 'admin') {
+                    showMessage(deleteEventMessage, 'Acceso denegado. Solo los administradores pueden eliminar eventos.', 'error');
+                    return;
+                }
+
+                const eventId = document.getElementById('delete_eventId').value;
+                if (!eventId) {
+                    showMessage(deleteEventMessage, 'Por favor, ingresa un ID de evento a eliminar.', 'error');
+                    return;
+                }
+
+                if (!confirm(`¿Estás seguro de que quieres eliminar el evento con ID: ${eventId}? Esta acción es irreversible y eliminará también los registros de usuarios inscritos en este evento.`)) {
+                    showMessage(deleteEventMessage, 'Eliminación cancelada.', 'info');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}events/delete.php`, {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            id: eventId,
+                            id_usuario: currentUserId
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showMessage(deleteEventMessage, data.message, 'success');
+                        if (deleteEventForm) deleteEventForm.reset();
+                    } else {
+                        showMessage(deleteEventMessage, data.message || 'Error al eliminar evento.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error de red al eliminar evento:', error);
+                    showMessage(deleteEventMessage, 'Error de conexión con el servidor.', 'error');
+                }
+            });
+        }
+
+
+        // 16. Registrarse en Evento
+        if (registerEventButton) {
+            registerEventButton.addEventListener('click', async (e) => {
+                e.preventDefault();
+                if (!currentUserId) {
+                    if (eventRegMessage) showMessage(eventRegMessage, 'Debes iniciar sesión para registrarte en un evento.', 'error');
+                    return;
+                }
+
+                const eventId = document.getElementById('event_reg_id').value;
+                if (!eventId) {
+                    if (eventRegMessage) showMessage(eventRegMessage, 'Ingresa un ID de evento.', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}events/register.php`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            id_usuario: currentUserId,
+                            id_evento: eventId
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        if (eventRegMessage) showMessage(eventRegMessage, data.message, 'success');
+                    } else {
+                        if (eventRegMessage) showMessage(eventRegMessage, data.message || 'Error al registrarse en el evento.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error de red al registrarse:', error);
+                    if (eventRegMessage) showMessage(eventRegMessage, 'Error de conexión con el servidor.', 'error');
+                }
+            });
+        }
+
+        // 17. Darse de Baja en Evento
+        if (unregisterEventButton) {
+            unregisterEventButton.addEventListener('click', async (e) => {
+                e.preventDefault();
+                if (!currentUserId) {
+                    if (eventRegMessage) showMessage(eventRegMessage, 'Debes iniciar sesión para darte de baja de un evento.', 'error');
+                    return;
+                }
+
+                const eventId = document.getElementById('event_reg_id').value;
+                if (!eventId) {
+                    if (eventRegMessage) showMessage(eventRegMessage, 'Ingresa un ID de evento.', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}events/unregister.php`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            id_usuario: currentUserId,
+                            id_evento: eventId
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        if (eventRegMessage) showMessage(eventRegMessage, data.message, 'success');
+                    } else {
+                        if (eventRegMessage) showMessage(eventRegMessage, data.message || 'Error al darse de baja del evento.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error de red al darse de baja:', error);
+                    if (eventRegMessage) showMessage(eventRegMessage, 'Error de conexión con el servidor.', 'error');
+                }
+            });
+        }
+
+
+        // 18. Cargar Eventos Futuros
+        if (loadFutureEventsButton) {
+            loadFutureEventsButton.addEventListener('click', async () => {
+                try {
+                    const response = await fetch(`${API_BASE_URL}events/future.php`);
+                    const data = await response.json();
+
+                    if (response.ok && data.records && data.records.length > 0) {
+                        if (futureEventsMessage) futureEventsMessage.style.display = 'none';
+                        let eventsHtml = '<table class="min-w-full bg-white border border-gray-200 rounded-md"><thead><tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal"><th class="py-3 px-6 text-left">ID</th><th class="py-3 px-6 text-left">Nombre</th><th class="py-3 px-6 text-left">Fecha</th><th class="py-3 px-6 text-left">Tipo</th></tr></thead><tbody>';
+                        data.records.forEach(event => {
+                            eventsHtml += `
+                                <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                    <td class="py-3 px-6 text-left whitespace-nowrap">${event.id}</td>
+                                    <td class="py-3 px-6 text-left">${event.nombre}</td>
+                                    <td class="py-3 px-6 text-left">${event.fecha}</td>
+                                    <td class="py-3 px-6 text-left">${event.tipo_evento}</td>
+                                </tr>
+                            `;
+                        });
+                        eventsHtml += '</tbody></table>';
+                        if (futureEventsListDiv) futureEventsListDiv.innerHTML = eventsHtml;
+                    } else {
+                        if (futureEventsMessage) showMessage(futureEventsMessage, data.message || 'No se encontraron eventos futuros.', 'error');
+                        if (futureEventsListDiv) futureEventsListDiv.innerHTML = '';
+                    }
+                } catch (error) {
+                    console.error('Error de red al cargar eventos futuros:', error);
+                    if (futureEventsMessage) showMessage(futureEventsMessage, 'Error de conexión.', 'error');
+                    if (futureEventsListDiv) futureEventsListDiv.innerHTML = '';
+                }
+            });
+        }
+
+        // 19. Buscar Eventos por Tipo (activado por botón)
+        if (searchEventsByTypeButton) {
+            searchEventsByTypeButton.addEventListener('click', async () => {
+                const eventType = eventTypeSearchInput.value.trim();
+                if (!eventType) {
+                    if (eventsByTypeMessage) showMessage(eventsByTypeMessage, 'Ingresa un tipo de evento para buscar.', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}events/read.php?type=${encodeURIComponent(eventType)}`);
+                    const data = await response.json();
+
+                    if (response.ok && data.records && data.records.length > 0) {
+                        if (eventsByTypeMessage) eventsByTypeMessage.style.display = 'none';
+                        let eventsHtml = '<table class="min-w-full bg-white border border-gray-200 rounded-md"><thead><tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal"><th class="py-3 px-6 text-left">ID</th><th class="py-3 px-6 text-left">Nombre</th><th class="py-3 px-6 text-left">Fecha</th><th class="py-3 px-6 text-left">Tipo</th></tr></thead><tbody>';
+                        data.records.forEach(event => {
+                            eventsHtml += `
+                                <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                    <td class="py-3 px-6 text-left whitespace-nowrap">${event.id}</td>
+                                    <td class="py-3 px-6 text-left">${event.nombre}</td>
+                                    <td class="py-3 px-6 text-left">${event.fecha}</td>
+                                    <td class="py-3 px-6 text-left">${event.tipo_evento}</td>
+                                </tr>
+                            `;
+                        });
+                        eventsHtml += '</tbody></table>';
+                        if (eventsByTypeResultDiv) eventsByTypeResultDiv.innerHTML = eventsHtml;
+                    } else {
+                        if (eventsByTypeMessage) showMessage(eventsByTypeMessage, data.message || 'No se encontraron eventos de ese tipo.', 'error');
+                        if (eventsByTypeResultDiv) eventsByTypeResultDiv.innerHTML = '';
+                    }
+                } catch (error) {
+                    console.error('Error de red al buscar eventos por tipo:', error);
+                    if (eventsByTypeMessage) showMessage(eventsByTypeMessage, 'Error de conexión.', 'error');
+                    if (eventsByTypeResultDiv) eventsByTypeResultDiv.innerHTML = '';
+                }
+            });
+        }
+
+
+        // 20. Eventos Populares (Más de N inscritos)
+        if (loadPopularEventsButton) {
+            loadPopularEventsButton.addEventListener('click', async () => {
+                const minInscriptions = minInscriptionsInput.value;
+                try {
+                    const response = await fetch(`${API_BASE_URL}stats/popular_events.php?min_inscriptions=${minInscriptions}`);
+                    const data = await response.json();
+
+                    if (response.ok && data.records && data.records.length > 0) {
+                        if (popularEventsMessage) popularEventsMessage.style.display = 'none';
+                        let eventsHtml = '<table class="min-w-full bg-white border border-gray-200 rounded-md"><thead><tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal"><th class="py-3 px-6 text-left">ID</th><th class="py-3 px-6 text-left">Nombre</th><th class="py-3 px-6 text-left">Fecha</th><th class="py-3 px-6 text-left">Tipo</th><th class="py-3 px-6 text-left">Inscritos</th></tr></thead><tbody>';
+                        data.records.forEach(event => {
+                            eventsHtml += `
+                                <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                    <td class="py-3 px-6 text-left whitespace-nowrap">${event.id}</td>
+                                    <td class="py-3 px-6 text-left">${event.nombre}</td>
+                                    <td class="py-3 px-6 text-left">${event.fecha}</td>
+                                    <td class="py-3 px-6 text-left">${event.tipo_evento}</td>
+                                    <td class="py-3 px-6 text-left">${event.total_inscritos}</td>
+                                </tr>
+                            `;
+                        });
+                        if (popularEventsListDiv) popularEventsListDiv.innerHTML = eventsHtml;
+                    } else {
+                        if (popularEventsMessage) showMessage(popularEventsMessage, data.message || `No se encontraron eventos con más de ${minInscriptions} inscritos.`, 'error');
+                        if (popularEventsListDiv) popularEventsListDiv.innerHTML = '';
+                    }
+                } catch (error) {
+                    console.error('Error de red al cargar eventos populares:', error);
+                    if (popularEventsMessage) showMessage(popularEventsMessage, 'Error de conexión.', 'error');
+                    if (popularEventsListDiv) popularEventsListDiv.innerHTML = '';
+                }
+            });
+        }
+
+        // --- FUNCIONALIDADES ESTADÍSTICAS ---
+
+        // Nuevos promedios de DUTS
+        // 21. Cargar Promedio Diario de DUTS
+        if (loadDailyAverageDutsButton) {
+            loadDailyAverageDutsButton.addEventListener('click', async () => {
+                hideAllDutsAverageLists(); // Ocultar otras listas antes de mostrar esta
+                try {
+                    const response = await fetch(`${API_BASE_URL}duts/average_daily.php`);
+                    const data = await response.json();
+
+                    if (response.ok && data.records && data.records.length > 0) {
+                        showMessage(dutsAveragesMessage, 'Promedio de DUTS diarios (total por día):', 'info', 0);
+                        let html = '<table class="min-w-full bg-white border border-gray-200 rounded-md"><thead><tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal"><th class="py-3 px-6 text-left">Día</th><th class="py-3 px-6 text-left">Total DUTS</th></tr></thead><tbody>';
+                        data.records.forEach(item => {
+                            html += `
+                                <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                    <td class="py-3 px-6 text-left">${item.dia}</td>
+                                    <td class="py-3 px-6 text-left">${formatDutsAmount(item.total_duts_dia)}</td>
+                                </tr>
+                            `;
+                        });
+                        html += '</tbody></table>';
+                        if (dailyDutsAverageList) dailyDutsAverageList.innerHTML = html;
+                    } else {
+                        showMessage(dutsAveragesMessage, data.message || 'No se encontraron datos de DUTS diarios.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error de red al cargar promedio diario de DUTS:', error);
+                    showMessage(dutsAveragesMessage, 'Error de conexión al cargar promedios diarios.', 'error');
+                }
+            });
+        }
+
+        // 22. Cargar Promedio Semanal de DUTS
+        if (loadWeeklyAverageDutsButton) {
+            loadWeeklyAverageDutsButton.addEventListener('click', async () => {
+                hideAllDutsAverageLists();
+                try {
+                    const response = await fetch(`${API_BASE_URL}duts/average_weekly.php`);
+                    const data = await response.json();
+
+                    if (response.ok && data.records && data.records.length > 0) {
+                        showMessage(dutsAveragesMessage, 'Promedio de DUTS semanales (total por semana):', 'info', 0);
+                        let html = '<table class="min-w-full bg-white border border-gray-200 rounded-md"><thead><tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal"><th class="py-3 px-6 text-left">Año</th><th class="py-3 px-6 text-left">Semana</th><th class="py-3 px-6 text-left">Total DUTS</th></tr></thead><tbody>';
+                        data.records.forEach(item => {
+                            html += `
+                                <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                    <td class="py-3 px-6 text-left">${item.anio}</td>
+                                    <td class="py-3 px-6 text-left">${item.semana}</td>
+                                    <td class="py-3 px-6 text-left">${formatDutsAmount(item.total_duts_semana)}</td>
+                                </tr>
+                            `;
+                        });
+                        html += '</tbody></table>';
+                        if (weeklyDutsAverageList) weeklyDutsAverageList.innerHTML = html;
+                    } else {
+                        showMessage(dutsAveragesMessage, data.message || 'No se encontraron datos de DUTS semanales.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error de red al cargar promedio semanal de DUTS:', error);
+                    showMessage(dutsAveragesMessage, 'Error de conexión al cargar promedios semanales.', 'error');
+                }
+            });
+        }
+
+        // 23. Cargar Promedio Mensual de DUTS
+        if (loadMonthlyAverageDutsButton) {
+            loadMonthlyAverageDutsButton.addEventListener('click', async () => {
+                hideAllDutsAverageLists();
+                try {
+                    const response = await fetch(`${API_BASE_URL}duts/average_monthly.php`);
+                    const data = await response.json();
+
+                    if (response.ok && data.records && data.records.length > 0) {
+                        showMessage(dutsAveragesMessage, 'Promedio de DUTS mensuales (total por mes):', 'info', 0);
+                        let html = '<table class="min-w-full bg-white border border-gray-200 rounded-md"><thead><tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal"><th class="py-3 px-6 text-left">Año</th><th class="py-3 px-6 text-left">Mes</th><th class="py-3 px-6 text-left">Total DUTS</th></tr></thead><tbody>';
+                        data.records.forEach(item => {
+                            html += `
+                                <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                    <td class="py-3 px-6 text-left">${item.anio}</td>
+                                    <td class="py-3 px-6 text-left">${item.nombre_mes}</td>
+                                    <td class="py-3 px-6 text-left">${formatDutsAmount(item.total_duts_mes)}</td>
+                                </tr>
+                            `;
+                        });
+                        html += '</tbody></table>';
+                        if (monthlyDutsAverageList) monthlyDutsAverageList.innerHTML = html;
+                    } else {
+                        showMessage(dutsAveragesMessage, data.message || 'No se encontraron datos de DUTS mensuales.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error de red al cargar promedio mensual de DUTS:', error);
+                    showMessage(dutsAveragesMessage, 'Error de conexión al cargar promedios mensuales.', 'error');
+                }
+            });
+        }
+
+        // 24. Cargar Promedio Semestral de DUTS
+        if (loadSemesterlyAverageDutsButton) {
+            loadSemesterlyAverageDutsButton.addEventListener('click', async () => {
+                hideAllDutsAverageLists();
+                try {
+                    const response = await fetch(`${API_BASE_URL}duts/average_semesterly.php`);
+                    const data = await response.json();
+
+                    if (response.ok && data.records && data.records.length > 0) {
+                        showMessage(dutsAveragesMessage, 'Promedio de DUTS semestrales (total por semestre):', 'info', 0);
+                        let html = '<table class="min-w-full bg-white border border-gray-200 rounded-md"><thead><tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal"><th class="py-3 px-6 text-left">Año</th><th class="py-3 px-6 text-left">Semestre</th><th class="py-3 px-6 text-left">Total DUTS</th></tr></thead><tbody>';
+                        data.records.forEach(item => {
+                            html += `
+                                <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                    <td class="py-3 px-6 text-left">${item.anio}</td>
+                                    <td class="py-3 px-6 text-left">Semestre ${item.semestre}</td>
+                                    <td class="py-3 px-6 text-left">${formatDutsAmount(item.total_duts_semestre)}</td>
+                                </tr>
+                            `;
+                        });
+                        html += '</tbody></table>';
+                        if (semesterlyDutsAverageList) semesterlyDutsAverageList.innerHTML = html;
+                    } else {
+                        showMessage(dutsAveragesMessage, data.message || 'No se encontraron datos de DUTS semestrales.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error de red al cargar promedio semestral de DUTS:', error);
+                    showMessage(dutsAveragesMessage, 'Error de conexión al cargar promedios semestrales.', 'error');
+                }
+            });
+        }
+
+        // 25. Cargar Promedio Anual de DUTS
+        if (loadYearlyAverageDutsButton) {
+            loadYearlyAverageDutsButton.addEventListener('click', async () => {
+                hideAllDutsAverageLists();
+                try {
+                    const response = await fetch(`${API_BASE_URL}duts/average_yearly.php`);
+                    const data = await response.json();
+
+                    if (response.ok && data.records && data.records.length > 0) {
+                        showMessage(dutsAveragesMessage, 'Promedio de DUTS anuales (total por año):', 'info', 0);
+                        let html = '<table class="min-w-full bg-white border border-gray-200 rounded-md"><thead><tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal"><th class="py-3 px-6 text-left">Año</th><th class="py-3 px-6 text-left">Total DUTS</th></tr></thead><tbody>';
+                        data.records.forEach(item => {
+                            html += `
+                                <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                    <td class="py-3 px-6 text-left">${item.anio}</td>
+                                    <td class="py-3 px-6 text-left">${formatDutsAmount(item.total_duts_anio)}</td>
+                                </tr>
+                            `;
+                        });
+                        html += '</tbody></table>';
+                        if (yearlyDutsAverageList) yearlyDutsAverageList.innerHTML = html;
+                    } else {
+                        showMessage(dutsAveragesMessage, data.message || 'No se encontraron datos de DUTS anuales.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error de red al cargar promedio anual de DUTS:', error);
+                    showMessage(dutsAveragesMessage, 'Error de conexión al cargar promedios anuales.', 'error');
+                }
+            });
+        }
+
+        // 26. Top 5 Usuarios con Más DUTS
+        if (loadTopUsersButton) {
+            loadTopUsersButton.addEventListener('click', async () => {
+                try {
+                    const response = await fetch(`${API_BASE_URL}stats/top_users.php`);
+                    const data = await response.json();
+
+                    if (response.ok && data.records && data.records.length > 0) {
+                        if (topUsersMessage) topUsersMessage.style.display = 'none';
+                        let usersHtml = '<table class="min-w-full bg-white border border-gray-200 rounded-md"><thead><tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal"><th class="py-3 px-6 text-left">ID</th><th class="py-3 px-6 text-left">Username</th><th class="py-3 px-6 text-left">Nombres</th><th class="py-3 px-6 text-left">Saldo DUTS</th></tr></thead><tbody>';
+                        data.records.forEach((user, index) => {
+                            const formattedSaldo = formatDutsAmount(user.saldo);
+                            usersHtml += `
+                                <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                    <td class="py-3 px-6 text-left whitespace-nowrap">${user.id}</td>
+                                    <td class="py-3 px-6 text-left">${user.username}</td>
+                                    <td class="py-3 px-6 text-left">${user.nombres} ${user.apellidos}</td>
+                                    <td class="py-3 px-6 text-left">${formattedSaldo}</td>
+                                </tr>
+                            `;
+                        });
+                        if (topUsersListDiv) topUsersListDiv.innerHTML = usersHtml;
+                    } else {
+                        if (topUsersMessage) showMessage(topUsersMessage, data.message || 'No se encontraron usuarios en el top 5.', 'error');
+                        if (topUsersListDiv) topUsersListDiv.innerHTML = '';
+                    }
+                } catch (error) {
+                    console.error('Error de red al cargar top usuarios:', error);
+                    if (topUsersMessage) showMessage(topUsersMessage, 'Error de conexión.', 'error');
+                    if (topUsersListDiv) topUsersListDiv.innerHTML = '';
+                }
+            });
+        }
+
+        // 27. Top 5 Usuarios con Menos DUTS
+        if (loadLeastUsersButton) {
+            loadLeastUsersButton.addEventListener('click', async () => {
+                try {
+                    const response = await fetch(`${API_BASE_URL}stats/least_users.php`);
+                    const data = await response.json();
+
+                    if (response.ok && data.records && data.records.length > 0) {
+                        if (leastUsersMessage) leastUsersMessage.style.display = 'none';
+                        let usersHtml = '<table class="min-w-full bg-white border border-gray-200 rounded-md"><thead><tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal"><th class="py-3 px-6 text-left">ID</th><th class="py-3 px-6 text-left">Username</th><th class="py-3 px-6 text-left">Nombres</th><th class="py-3 px-6 text-left">Saldo DUTS</th></tr></thead><tbody>';
+                        data.records.forEach((user, index) => {
+                            const formattedSaldo = formatDutsAmount(user.saldo);
+                            usersHtml += `
+                                <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                    <td class="py-3 px-6 text-left whitespace-nowrap">${user.id}</td>
+                                    <td class="py-3 px-6 text-left">${user.username}</td>
+                                    <td class="py-3 px-6 text-left">${user.nombres} ${user.apellidos}</td>
+                                    <td class="py-3 px-6 text-left">${formattedSaldo}</td>
+                                </tr>
+                            `;
+                        });
+                        if (leastUsersListDiv) leastUsersListDiv.innerHTML = usersHtml;
+                    } else {
+                        if (leastUsersMessage) showMessage(leastUsersMessage, data.message || 'No se encontraron usuarios con menos DUTS.', 'error');
+                        if (leastUsersListDiv) leastUsersListDiv.innerHTML = '';
+                    }
+                } catch (error) {
+                    console.error('Error de red al cargar usuarios con menos DUTS:', error);
+                    if (leastUsersMessage) showMessage(leastUsersMessage, 'Error de conexión.', 'error');
+                    if (leastUsersListDiv) leastUsersListDiv.innerHTML = '';
+                }
+            });
+        }
+
+
+        // 28. Cantidad de Eventos a los que un Usuario está Inscrito
+        if (userEventCountForm) {
+            userEventCountForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const userId = document.getElementById('userEventCountId').value;
+                if (!userId) {
+                    if (userEventCountResultDiv) showMessage(userEventCountResultDiv, 'Ingresa un ID de usuario.', 'error');
+                    if (document.getElementById('userEventCountDisplay')) document.getElementById('userEventCountDisplay').style.display = 'none';
+                    return;
+                }
+                try {
+                    const response = await fetch(`${API_BASE_URL}stats/user_event_count.php?user_id=${userId}`);
+                    const data = await response.json();
+                    if (response.ok) {
+                        if (userEventCountResultDiv) userEventCountResultDiv.style.display = 'none';
+                        if (document.getElementById('userEventCountDisplay')) {
+                            document.getElementById('userEventCountDisplay').textContent = `El usuario ${userId} está inscrito en ${data.total_eventos_inscritos} eventos.`;
+                            document.getElementById('userEventCountDisplay').className = 'mt-4 text-gray-700 p-2 bg-green-100 rounded-md';
+                            document.getElementById('userEventCountDisplay').style.display = 'block';
+                        }
+                    } else {
+                        if (userEventCountResultDiv) showMessage(userEventCountResultDiv, data.message || 'Error al cargar conteo de eventos.', 'error');
+                        if (document.getElementById('userEventCountDisplay')) document.getElementById('userEventCountDisplay').style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Error al cargar conteo de eventos:', error);
+                    if (userEventCountResultDiv) showMessage(userEventCountResultDiv, 'Error de conexión.', 'error');
+                    if (document.getElementById('userEventCountDisplay')) document.getElementById('userEventCountDisplay').style.display = 'none';
+                }
+            });
+        }
+
+        // 29. Usuarios Inscritos en un Evento Específico
+        if (eventUsersForm) {
+            eventUsersForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const eventId = document.getElementById('eventUsersId').value;
+                if (!eventId) {
+                    if (eventUsersMessage) showMessage(eventUsersMessage, 'Ingresa un ID de evento.', 'error');
+                    return;
+                }
+                try {
+                    const response = await fetch(`${API_BASE_URL}stats/event_registered_users.php?event_id=${eventId}`);
+                    const data = await response.json();
+
+                    if (response.ok && data.records && data.records.length > 0) {
+                        if (eventUsersMessage) eventUsersMessage.style.display = 'none';
+                        let usersHtml = '<table class="min-w-full bg-white border border-gray-200 rounded-md"><thead><tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal"><th class="py-3 px-6 text-left">ID</th><th class="py-3 px-6 text-left">Username</th><th class="py-3 px-6 text-left">Nombres</th><th class="py-3 px-6 text-left">Email</th></tr></thead><tbody>';
+                        data.records.forEach(user => {
+                            usersHtml += `
+                                <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                    <td class="py-3 px-6 text-left whitespace-nowrap">${user.id}</td>
+                                    <td class="py-3 px-6 text-left">${user.username}</td>
+                                    <td class="py-3 px-6 text-left">${user.nombres} ${user.apellidos}</td>
+                                    <td class="py-3 px-6 text-left">${user.email}</td>
+                                </tr>
+                            `;
+                        });
+                        if (eventUsersListDiv) eventUsersListDiv.innerHTML = usersHtml;
+                    } else {
+                        if (eventUsersMessage) showMessage(eventUsersMessage, data.message || 'No se encontraron usuarios inscritos en este evento.', 'error');
+                        if (eventUsersListDiv) eventUsersListDiv.innerHTML = '';
+                    }
+                } catch (error) {
+                    console.error('Error al cargar usuarios inscritos:', error);
+                    if (eventUsersMessage) showMessage(eventUsersMessage, 'Error de conexión.', 'error');
+                    if (eventUsersListDiv) eventUsersListDiv.innerHTML = '';
+                }
+            });
+        }
+
+        // 30. Usuarios que nunca han asistido a un evento
+        if (loadUsersNoEventsButton) {
+            loadUsersNoEventsButton.addEventListener('click', async () => {
+                try {
+                    const response = await fetch(`${API_BASE_URL}stats/users_no_events.php`);
+                    const data = await response.json();
+
+                    if (response.ok && data.records && data.records.length > 0) {
+                        if (usersNoEventsMessage) usersNoEventsMessage.style.display = 'none';
+                        let usersHtml = '<table class="min-w-full bg-white border border-gray-200 rounded-md"><thead><tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal"><th class="py-3 px-6 text-left">ID</th><th class="py-3 px-6 text-left">Username</th><th class="py-3 px-6 text-left">Nombres</th><th class="py-3 px-6 text-left">Email</th><th class="py-3 px-6 text-left">Rol</th></tr></thead><tbody>';
+                        data.records.forEach(user => {
+                            usersHtml += `
+                                <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                    <td class="py-3 px-6 text-left whitespace-nowrap">${user.id}</td>
+                                    <td class="py-3 px-6 text-left">${user.username}</td>
+                                    <td class="py-3 px-6 text-left">${user.nombres} ${user.apellidos}</td>
+                                    <td class="py-3 px-6 text-left">${user.email}</td>
+                                    <td class="py-3 px-6 text-left">${user.rol}</td>
+                                </tr>
+                            `;
+                        });
+                        if (usersNoEventsListDiv) usersNoEventsListDiv.innerHTML = usersHtml;
+                    } else {
+                        if (usersNoEventsMessage) showMessage(usersNoEventsMessage, data.message || 'Todos los usuarios han asistido al menos a un evento.', 'error');
+                        if (usersNoEventsListDiv) usersNoEventsListDiv.innerHTML = '';
+                    }
+                } catch (error) {
+                    console.error('Error de red al cargar usuarios sin eventos:', error);
+                    if (usersNoEventsMessage) showMessage(usersNoEventsMessage, 'Error de conexión.', 'error');
+                    if (usersNoEventsListDiv) usersNoEventsListDiv.innerHTML = '';
+                }
+            });
+        }
+
+
+        // Inicializar la UI al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            updateLoginUI();
+            switchTab('dashboard'); // Mostrar la pestaña de inicio por defecto
+        });
+    </script>
+</body>
+</html>
